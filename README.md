@@ -17,6 +17,10 @@ Backend architecture:
 Backend reference:
 - `README (Backend).md`
 
+Current deployed backend base URL:
+- `https://finance-backend-gold.vercel.app/`
+- Keep this configurable via BuildConfig (do not hardcode in multiple places)
+
 ## Current Status
 
 This repository currently contains:
@@ -93,6 +97,12 @@ finance-android/
 
 Source of truth:
 - `README (Backend).md`
+
+Current base URL (deployed):
+- `https://finance-backend-gold.vercel.app/`
+
+Local backend fallback:
+- `http://localhost:3000`
 
 Protected endpoints use:
 - `Authorization: Bearer <token>`

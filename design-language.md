@@ -51,7 +51,8 @@ Backend summary:
 
 Server behavior:
 - Uses `process.env.PORT` with fallback `3000`
-- Local default URL typically `http://localhost:3000` (for emulator, configure host mapping as needed)
+- Current deployed backend base URL: `https://finance-backend-gold.vercel.app/`
+- Local default URL: `http://localhost:3000` (for emulator, configure host mapping as needed)
 
 ## 4. Information Architecture
 

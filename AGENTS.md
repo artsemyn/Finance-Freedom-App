@@ -104,6 +104,7 @@ Backend stack:
 
 Base behavior:
 - Backend runs on `process.env.PORT` with fallback `3000` (local default: `http://localhost:3000`)
+- Current deployed backend base URL: `https://finance-backend-gold.vercel.app/` (must remain configurable via BuildConfig)
 - Android must consume backend via REST API only
 - Android must never connect directly to PostgreSQL
 
@@ -229,6 +230,8 @@ If no files were modified, no entry required.
 
 ## 13. Change Log
 
+2026-02-23 | Codex | app/build.gradle.kts, AGENTS.md | Wired deployed backend URL into Android BuildConfig as BASE_URL.
+2026-02-23 | Codex | AGENTS.md, README.md, design-language.md | Set deployed backend address to https://finance-backend-gold.vercel.app/ in project documentation and API integration guidance.
 2026-02-23 | Codex | AGENTS.md, design-language.md, README.md | Rewrote design-language to Android/backend-aligned spec, added Android project README, and fixed backend fallback port to 3000 for doc consistency.
 2026-02-23 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/data/remote/.gitkeep, app/src/main/java/com/example/financefreedom/data/local/.gitkeep, app/src/main/java/com/example/financefreedom/data/repository/.gitkeep, app/src/main/java/com/example/financefreedom/domain/model/.gitkeep, app/src/main/java/com/example/financefreedom/domain/usecase/.gitkeep, app/src/main/java/com/example/financefreedom/ui/home/.gitkeep, app/src/main/java/com/example/financefreedom/ui/report/.gitkeep, app/src/main/java/com/example/financefreedom/ui/add/.gitkeep, app/src/main/java/com/example/financefreedom/ui/history/.gitkeep, app/src/main/java/com/example/financefreedom/ui/profile/.gitkeep, app/src/main/java/com/example/financefreedom/utils/.gitkeep | Created MVVM package skeleton in source tree and aligned documented package path.
 2026-02-23 | Codex | AGENTS.md | Matched backend integration details with README (Backend).md and corrected backend reference filename.
