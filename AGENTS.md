@@ -216,7 +216,32 @@ When implementing new features:
 6. Connect to UI
 7. Handle loading/error states
 
-## 12. Agent Change Logging (Mandatory)
+## 12. Roadmap Context (Roadmap.md)
+
+Roadmap source:
+- `Roadmap.md` at repository root is the implementation timeline reference.
+
+Phase order to follow:
+1. Phase 0: Foundation & Architecture Setup
+2. Phase 1: Authentication
+3. Phase 2: Transactions Core
+4. Phase 3: Savings Goals
+5. Phase 4: Reminder + Notification
+6. Phase 5: Home Dashboard
+7. Phase 6: Report & Analytics
+8. Phase 7: UI & Design Polish
+9. Phase 8: Security Hardening
+10. Phase 9: Testing & Stabilization
+11. Phase 10: Production Readiness
+
+Phase 0 mandatory baseline (must be completed before Phase 1):
+- Add required app dependencies (Retrofit, OkHttp, Coroutines, ViewModel, Navigation, WorkManager, EncryptedSharedPreferences)
+- Keep MVVM chain strict: UI -> ViewModel -> Repository -> Remote
+- Implement networking foundation (`ApiService`, Retrofit builder, JWT interceptor, BuildConfig base URL)
+- Implement global 401 handling flow and session/token clearing path
+- Keep token encrypted and never log JWT
+
+## 13. Agent Change Logging (Mandatory)
 
 Any agent modifying files in this repository must:
 - Update this `AGENTS.md`
@@ -228,8 +253,9 @@ Format:
 
 If no files were modified, no entry required.
 
-## 13. Change Log
+## 14. Change Log
 
+2026-02-24 | Codex | AGENTS.md, gradle/libs.versions.toml, app/build.gradle.kts, app/src/main/AndroidManifest.xml, app/src/main/java/com/example/financefreedom/data/local/TokenManager.kt, app/src/main/java/com/example/financefreedom/data/local/SessionManager.kt, app/src/main/java/com/example/financefreedom/data/remote/ApiService.kt, app/src/main/java/com/example/financefreedom/data/remote/ApiClient.kt, app/src/main/java/com/example/financefreedom/data/remote/AuthInterceptor.kt, app/src/main/java/com/example/financefreedom/data/remote/UnauthorizedHandler.kt, app/src/main/java/com/example/financefreedom/utils/Result.kt, app/src/main/java/com/example/financefreedom/utils/ApiErrorParser.kt | Implemented Phase 0 foundation: core dependencies, networking baseline with JWT + global 401 handling, encrypted token storage, and roadmap alignment section.
 2026-02-23 | Codex | app/build.gradle.kts, AGENTS.md | Wired deployed backend URL into Android BuildConfig as BASE_URL.
 2026-02-23 | Codex | AGENTS.md, README.md, design-language.md | Set deployed backend address to https://finance-backend-gold.vercel.app/ in project documentation and API integration guidance.
 2026-02-23 | Codex | AGENTS.md, design-language.md, README.md | Rewrote design-language to Android/backend-aligned spec, added Android project README, and fixed backend fallback port to 3000 for doc consistency.
