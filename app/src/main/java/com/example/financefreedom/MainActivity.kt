@@ -11,6 +11,7 @@ import com.example.financefreedom.data.local.SessionManager
 import com.example.financefreedom.data.local.TokenManager
 import com.example.financefreedom.data.remote.ApiClient
 import com.example.financefreedom.data.repository.AuthRepositoryImpl
+import com.example.financefreedom.data.repository.TransactionRepositoryImpl
 import com.example.financefreedom.ui.navigation.AppNavGraph
 import com.example.financefreedom.ui.theme.FinanceFreedomTheme
 
@@ -28,8 +29,12 @@ class MainActivity : ComponentActivity() {
                         tokenManager = TokenManager(applicationContext)
                     )
                 }
+                val transactionRepository = remember {
+                    TransactionRepositoryImpl(apiService = apiService)
+                }
                 AppNavGraph(
                     authRepository = authRepository,
+                    transactionRepository = transactionRepository,
                     sessionManager = sessionManager
                 )
             }

@@ -250,7 +250,7 @@ Status legend:
 
 - [x] Phase 0: Foundation & Architecture Setup
 - [x] Phase 1: Authentication
-- [ ] Phase 2: Transactions Core
+- [x] Phase 2: Transactions Core
 - [ ] Phase 3: Savings Goals
 - [ ] Phase 4: Reminder + Notification
 - [ ] Phase 5: Home Dashboard
@@ -273,6 +273,18 @@ Format:
 If no files were modified, no entry required.
 
 ## 15. Change Log
+
+2026-02-25 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/data/remote/ApiService.kt, app/src/main/java/com/example/financefreedom/data/remote/dto/TransactionDto.kt, app/src/main/java/com/example/financefreedom/data/remote/mapper/TransactionMapper.kt, app/src/main/java/com/example/financefreedom/domain/model/TransactionCategories.kt, app/src/main/java/com/example/financefreedom/data/repository/TransactionRepository.kt, app/src/main/java/com/example/financefreedom/data/repository/TransactionRepositoryImpl.kt, app/src/main/java/com/example/financefreedom/ui/add/AddTransactionViewModel.kt, app/src/main/java/com/example/financefreedom/ui/add/AddTransactionScreen.kt, app/src/main/java/com/example/financefreedom/ui/history/HistoryUiState.kt, app/src/main/java/com/example/financefreedom/ui/history/HistoryViewModel.kt, app/src/main/java/com/example/financefreedom/ui/history/HistoryScreen.kt, app/src/main/java/com/example/financefreedom/ui/transactions/TransactionFormOptions.kt | Switched transaction category dropdowns to backend-driven data from GET /transactions/categories for add/edit flows and removed hardcoded local category lists.
+
+2026-02-25 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/ui/add/AddTransactionScreen.kt | Fixed Kotlin compile issue by correcting Add Transaction dialog import to `androidx.compose.ui.window.Dialog`.
+
+2026-02-25 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/ui/add/AddTransactionScreen.kt, app/src/main/java/com/example/financefreedom/ui/navigation/AppNavGraph.kt | Changed Add Transaction to popup dialog window and replaced type toggle buttons with tab-based Income/Expense switching.
+
+2026-02-25 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/ui/history/HistoryScreen.kt | Updated Rupiah display format to Indonesian style `Rp x.xxx.xxx` (grouped thousands, no decimal digits).
+
+2026-02-25 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/data/remote/dto/TransactionDto.kt, app/src/main/java/com/example/financefreedom/data/remote/mapper/TransactionMapper.kt, app/src/main/java/com/example/financefreedom/ui/transactions/TransactionFormOptions.kt, app/src/main/java/com/example/financefreedom/ui/add/AddTransactionScreen.kt, app/src/main/java/com/example/financefreedom/ui/history/HistoryScreen.kt | Fixed transaction amount payload type to numeric for backend compatibility, added calendar date picker inputs, and added category dropdown selections for add/edit transaction flows.
+
+2026-02-25 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/MainActivity.kt, app/src/main/java/com/example/financefreedom/data/remote/ApiService.kt, app/src/main/java/com/example/financefreedom/domain/model/Transaction.kt, app/src/main/java/com/example/financefreedom/data/remote/dto/TransactionDto.kt, app/src/main/java/com/example/financefreedom/data/remote/mapper/TransactionMapper.kt, app/src/main/java/com/example/financefreedom/data/repository/TransactionRepository.kt, app/src/main/java/com/example/financefreedom/data/repository/TransactionRepositoryImpl.kt, app/src/main/java/com/example/financefreedom/ui/add/AddTransactionUiState.kt, app/src/main/java/com/example/financefreedom/ui/add/AddTransactionViewModel.kt, app/src/main/java/com/example/financefreedom/ui/add/AddTransactionScreen.kt, app/src/main/java/com/example/financefreedom/ui/history/HistoryUiState.kt, app/src/main/java/com/example/financefreedom/ui/history/HistoryViewModel.kt, app/src/main/java/com/example/financefreedom/ui/history/HistoryScreen.kt, app/src/main/java/com/example/financefreedom/ui/transactions/TransactionViewModelFactory.kt, app/src/main/java/com/example/financefreedom/ui/home/HomeScreen.kt, app/src/main/java/com/example/financefreedom/ui/navigation/Routes.kt, app/src/main/java/com/example/financefreedom/ui/navigation/AppNavGraph.kt | Implemented Phase 2 transactions core: CRUD API wiring, repository + mapping, add transaction flow, history list with search/filter, inline edit/delete, and BigDecimal balance summary in ViewModel.
 
 2026-02-25 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/ui/auth/LoginScreen.kt | Updated login UX so credential-related errors clear email/password inputs instead of leaving stale values.
 
