@@ -241,7 +241,26 @@ Phase 0 mandatory baseline (must be completed before Phase 1):
 - Implement global 401 handling flow and session/token clearing path
 - Keep token encrypted and never log JWT
 
-## 13. Agent Change Logging (Mandatory)
+## 13. Project Progress Checklist
+
+Use this checklist to track roadmap completion status.  
+Status legend:
+- `[x]` Completed
+- `[ ]` Not Started / In Progress
+
+- [x] Phase 0: Foundation & Architecture Setup
+- [x] Phase 1: Authentication
+- [ ] Phase 2: Transactions Core
+- [ ] Phase 3: Savings Goals
+- [ ] Phase 4: Reminder + Notification
+- [ ] Phase 5: Home Dashboard
+- [ ] Phase 6: Report & Analytics
+- [ ] Phase 7: UI & Design Polish
+- [ ] Phase 8: Security Hardening
+- [ ] Phase 9: Testing & Stabilization
+- [ ] Phase 10: Production Readiness
+
+## 14. Agent Change Logging (Mandatory)
 
 Any agent modifying files in this repository must:
 - Update this `AGENTS.md`
@@ -253,7 +272,15 @@ Format:
 
 If no files were modified, no entry required.
 
-## 14. Change Log
+## 15. Change Log
+
+2026-02-25 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/ui/auth/LoginScreen.kt | Updated login UX so credential-related errors clear email/password inputs instead of leaving stale values.
+
+2026-02-25 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/data/repository/AuthRepositoryImpl.kt, app/src/main/java/com/example/financefreedom/ui/navigation/AppNavGraph.kt | Fixed register success handling for backends that do not return token on register; route to login after register unless token is present.
+
+2026-02-25 | Codex | AGENTS.md, gradle/libs.versions.toml, app/build.gradle.kts, app/src/main/java/com/example/financefreedom/MainActivity.kt, app/src/main/java/com/example/financefreedom/data/remote/ApiService.kt, app/src/main/java/com/example/financefreedom/data/remote/dto/AuthDto.kt, app/src/main/java/com/example/financefreedom/data/remote/mapper/AuthMapper.kt, app/src/main/java/com/example/financefreedom/domain/model/User.kt, app/src/main/java/com/example/financefreedom/data/repository/AuthRepository.kt, app/src/main/java/com/example/financefreedom/data/repository/AuthRepositoryImpl.kt, app/src/main/java/com/example/financefreedom/ui/auth/AuthUiState.kt, app/src/main/java/com/example/financefreedom/ui/auth/AuthViewModelFactory.kt, app/src/main/java/com/example/financefreedom/ui/auth/LoginViewModel.kt, app/src/main/java/com/example/financefreedom/ui/auth/RegisterViewModel.kt, app/src/main/java/com/example/financefreedom/ui/auth/StartupViewModel.kt, app/src/main/java/com/example/financefreedom/ui/auth/LoginScreen.kt, app/src/main/java/com/example/financefreedom/ui/auth/RegisterScreen.kt, app/src/main/java/com/example/financefreedom/ui/navigation/Routes.kt, app/src/main/java/com/example/financefreedom/ui/navigation/AppNavGraph.kt, app/src/main/java/com/example/financefreedom/ui/home/HomeScreen.kt, app/src/main/java/com/example/financefreedom/ui/profile/ProfileScreen.kt | Implemented Phase 1 authentication flow end-to-end: register/login/me integration, encrypted token session bootstrap, logout, 401-driven session handling, and Compose auth navigation with placeholder home/profile screens.
+
+2026-02-25 | Codex | AGENTS.md | Added a roadmap-based project progress checklist section and initialized current phase statuses.
 
 2026-02-24 | Codex | AGENTS.md, gradle/libs.versions.toml, app/build.gradle.kts, app/src/main/AndroidManifest.xml, app/src/main/java/com/example/financefreedom/data/local/TokenManager.kt, app/src/main/java/com/example/financefreedom/data/local/SessionManager.kt, app/src/main/java/com/example/financefreedom/data/remote/ApiService.kt, app/src/main/java/com/example/financefreedom/data/remote/ApiClient.kt, app/src/main/java/com/example/financefreedom/data/remote/AuthInterceptor.kt, app/src/main/java/com/example/financefreedom/data/remote/UnauthorizedHandler.kt, app/src/main/java/com/example/financefreedom/utils/Result.kt, app/src/main/java/com/example/financefreedom/utils/ApiErrorParser.kt | Implemented Phase 0 foundation: core dependencies, networking baseline with JWT + global 401 handling, encrypted token storage, and roadmap alignment section.
 2026-02-23 | Codex | app/build.gradle.kts, AGENTS.md | Wired deployed backend URL into Android BuildConfig as BASE_URL.
