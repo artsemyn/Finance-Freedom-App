@@ -4,9 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.tooling.preview.Preview
 import com.example.financefreedom.data.local.SessionManager
 import com.example.financefreedom.data.local.TokenManager
 import com.example.financefreedom.data.remote.ApiClient
@@ -21,34 +19,31 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             FinanceFreedomTheme {
-                val sessionManager = remember { SessionManager() }
-                val apiService = remember { ApiClient.getApiService(applicationContext, sessionManager) }
+                val tokenManager = remember { TokenManager(applicationContext) }
+                val sessionManager = remember {
+                    SessionManager().apply {
+                        updateToken(tokenManager.getToken())
+                    }
+                }
+                val apiService = remember { ApiClient.getApiService(sessionManager) }
                 val authRepository = remember {
                     AuthRepositoryImpl(
-                        apiService = apiService,
-                        tokenManager = TokenManager(applicationContext)
+                        apiService     = apiService,
+                        tokenManager   = tokenManager,
+                        sessionManager = sessionManager
                     )
                 }
                 val transactionRepository = remember {
                     TransactionRepositoryImpl(apiService = apiService)
                 }
+
+                // ✅ Satu titik masuk — semua navigasi dikelola AppNavGraph
                 AppNavGraph(
-                    authRepository = authRepository,
+                    authRepository        = authRepository,
                     transactionRepository = transactionRepository,
-                    sessionManager = sessionManager
+                    sessionManager        = sessionManager
                 )
             }
         }
     }
-}
-
-@Composable
-fun AppPreview() {
-    FinanceFreedomTheme {}
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AppPreviewHost() {
-    AppPreview()
 }

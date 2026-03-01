@@ -274,6 +274,8 @@ If no files were modified, no entry required.
 
 ## 15. Change Log
 
+2026-03-01 | Codex | app/build.gradle.kts, ProfileScreen.kt | Added profile photo feature: pick from gallery, save locally (profile_photo.jpg in filesDir), show in avatar; Coil dependency for AsyncImage; "Ganti foto" camera badge and tap-to-change.
+
 2026-02-25 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/data/remote/ApiService.kt, app/src/main/java/com/example/financefreedom/data/remote/dto/TransactionDto.kt, app/src/main/java/com/example/financefreedom/data/remote/mapper/TransactionMapper.kt, app/src/main/java/com/example/financefreedom/domain/model/TransactionCategories.kt, app/src/main/java/com/example/financefreedom/data/repository/TransactionRepository.kt, app/src/main/java/com/example/financefreedom/data/repository/TransactionRepositoryImpl.kt, app/src/main/java/com/example/financefreedom/ui/add/AddTransactionViewModel.kt, app/src/main/java/com/example/financefreedom/ui/add/AddTransactionScreen.kt, app/src/main/java/com/example/financefreedom/ui/history/HistoryUiState.kt, app/src/main/java/com/example/financefreedom/ui/history/HistoryViewModel.kt, app/src/main/java/com/example/financefreedom/ui/history/HistoryScreen.kt, app/src/main/java/com/example/financefreedom/ui/transactions/TransactionFormOptions.kt | Switched transaction category dropdowns to backend-driven data from GET /transactions/categories for add/edit flows and removed hardcoded local category lists.
 
 2026-02-25 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/ui/add/AddTransactionScreen.kt | Fixed Kotlin compile issue by correcting Add Transaction dialog import to `androidx.compose.ui.window.Dialog`.

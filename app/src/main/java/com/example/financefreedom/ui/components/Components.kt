@@ -1,7 +1,6 @@
-package com.example.financefreedom.ui
-
 package com.example.financefreedom.ui.components
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -10,20 +9,17 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
 import com.example.financefreedom.ui.theme.AppColors
@@ -57,7 +53,7 @@ fun PrimaryButton(
             )
             .clickable(
                 interactionSource = interactionSource,
-                indication = rememberRipple(color = Color.White.copy(alpha = 0.2f)),
+                indication = ripple(color = Color.White.copy(alpha = 0.2f)),
                 enabled = enabled && !isLoading,
                 onClick = onClick
             ),
@@ -98,7 +94,7 @@ fun GhostButton(
             .border(1.dp, AppColors.Outline, RoundedCornerShape(16.dp))
             .clickable(
                 interactionSource = interactionSource,
-                indication = rememberRipple(color = AppColors.Accent.copy(alpha = 0.1f)),
+                indication = ripple(color = AppColors.Accent.copy(alpha = 0.1f)),
                 onClick = onClick
             ),
         contentAlignment = Alignment.Center
