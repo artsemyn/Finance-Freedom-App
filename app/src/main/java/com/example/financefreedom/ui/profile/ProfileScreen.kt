@@ -57,10 +57,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.example.financefreedom.data.local.ThemeMode
 import com.example.financefreedom.data.repository.AuthRepository
+import com.example.financefreedom.domain.model.UserProfile
+import com.example.financefreedom.ui.theme.FinanceFreedomTheme
+import com.example.financefreedom.ui.theme.financeUiColors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -68,23 +73,26 @@ import java.io.File
 import java.io.FileOutputStream
 
 // ─── Design Tokens ────────────────────────────────────────────────────────────
-private val BgDeep      = Color(0xFF0F1117)
-private val BgCard      = Color(0xFF1E2330)
-private val BgCardAlt   = Color(0xFF232838)
-private val AccentGreen = Color(0xFF34D997)
-private val AccentRed   = Color(0xFFFF6B6B)
-private val TextPrimary = Color(0xFFF0F2F8)
-private val TextSecond  = Color(0xFF8A90A4)
-private val TextMuted   = Color(0xFF565C72)
-private val DividerCol  = Color(0xFF252A38)
+private val BgDeep = Color(0xFFDFDFDF)
+private val BgCard = Color(0xFFF7F7F4)
+private val BgCardAlt = Color(0xFFE8EFE8)
+private val AccentGreen = Color(0xFF70AD77)
+private val AccentRed = Color(0xFFB85C5C)
+private val TextPrimary = Color(0xFF193032)
+private val TextSecond = Color(0xFF47615B)
+private val TextMuted = Color(0xFF62716B)
+private val DividerCol = Color(0xFFD0D0CA)
 
 // ─── Main Screen ──────────────────────────────────────────────────────────────
 
 @Composable
 fun ProfileScreen(
     authRepository: AuthRepository,
+    themeMode: ThemeMode,
+    onThemeModeChange: (ThemeMode) -> Unit,
     onLogout: () -> Unit
 ) {
+    val ui = financeUiColors()
     var profileEmail   by remember { mutableStateOf("") }
     var isLoading      by remember { mutableStateOf(true) }
     var errorMessage   by remember { mutableStateOf<String?>(null) }
@@ -142,7 +150,7 @@ fun ProfileScreen(
 
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = BgDeep
+        color = ui.background
     ) {
         Column(
             modifier = Modifier
@@ -192,13 +200,20 @@ fun ProfileScreen(
                         icon  = Icons.Rounded.Security,
                         label = "Status",
                         value = "Terverifikasi",
-                        valueColor = AccentGreen
+                        valueColor = ui.positive
                     )
                 }
 
                 Spacer(Modifier.height(16.dp))
                 SectionLabel("APLIKASI")
                 Spacer(Modifier.height(8.dp))
+
+                ThemeModeCard(
+                    selectedMode = themeMode,
+                    onThemeModeChange = onThemeModeChange
+                )
+
+                Spacer(Modifier.height(12.dp))
 
                 ProfileInfoCard {
                     InfoRow(
@@ -226,6 +241,8 @@ fun ProfileScreen(
 
 @Composable
 private fun ProfileHeader() {
+    val ui = financeUiColors()
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -238,13 +255,13 @@ private fun ProfileHeader() {
                 text     = "Profil",
                 fontSize = 26.sp,
                 fontWeight = FontWeight.ExtraBold,
-                color    = TextPrimary,
+                color    = ui.primaryText,
                 letterSpacing = (-0.5).sp
             )
             Text(
                 text     = "Kelola akun kamu",
                 fontSize = 14.sp,
-                color    = TextSecond,
+                color    = ui.secondaryText,
                 fontWeight = FontWeight.Medium
             )
         }
@@ -253,14 +270,14 @@ private fun ProfileHeader() {
             modifier = Modifier
                 .size(44.dp)
                 .clip(CircleShape)
-                .background(BgCard)
-                .border(1.dp, DividerCol, CircleShape),
+                .background(ui.surface)
+                .border(1.dp, ui.outline, CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector        = Icons.Rounded.Person,
                 contentDescription = null,
-                tint               = AccentGreen,
+                tint               = ui.positive,
                 modifier           = Modifier.size(20.dp)
             )
         }
@@ -276,13 +293,15 @@ private fun AvatarCard(
     profilePhotoPath: String?,
     onAddOrChangePhoto: () -> Unit
 ) {
+    val ui = financeUiColors()
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
             .clip(RoundedCornerShape(24.dp))
-            .background(BgCard)
-            .border(1.dp, DividerCol, RoundedCornerShape(24.dp))
+            .background(ui.surface)
+            .border(1.dp, ui.outline, RoundedCornerShape(24.dp))
             .padding(24.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -308,15 +327,15 @@ private fun AvatarCard(
                         .background(
                             Brush.radialGradient(
                                 listOf(
-                                    AccentGreen.copy(alpha = 0.2f),
-                                    AccentGreen.copy(alpha = 0.05f)
+                                    ui.positive.copy(alpha = 0.2f),
+                                    ui.accent.copy(alpha = 0.05f)
                                 )
                             )
                         )
                         .border(
                             width = 1.5.dp,
                             brush = Brush.linearGradient(
-                                listOf(AccentGreen.copy(alpha = 0.6f), AccentGreen.copy(alpha = 0.1f))
+                                listOf(ui.positive.copy(alpha = 0.6f), ui.accent.copy(alpha = 0.1f))
                             ),
                             shape = CircleShape
                         ),
@@ -335,7 +354,7 @@ private fun AvatarCard(
                         Icon(
                             imageVector        = Icons.Rounded.AccountCircle,
                             contentDescription = null,
-                            tint               = AccentGreen,
+                            tint               = ui.positive,
                             modifier          = Modifier.size(48.dp)
                         )
                     }
@@ -346,8 +365,8 @@ private fun AvatarCard(
                         .align(Alignment.BottomEnd)
                         .size(28.dp)
                         .clip(CircleShape)
-                        .background(AccentGreen)
-                        .border(1.5.dp, BgCard, CircleShape),
+                        .background(ui.positive)
+                        .border(1.5.dp, ui.surface, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -363,14 +382,14 @@ private fun AvatarCard(
             Text(
                 text       = if (profilePhotoPath != null) "Ketuk untuk ganti foto" else "Ketuk untuk tambah foto",
                 fontSize   = 11.sp,
-                color      = TextMuted,
+                color      = ui.mutedText,
                 fontWeight = FontWeight.Medium
             )
 
             // Email / loading
             if (isLoading) {
                 CircularProgressIndicator(
-                    color       = AccentGreen,
+                    color       = ui.positive,
                     strokeWidth = 2.dp,
                     modifier    = Modifier.size(20.dp)
                 )
@@ -380,7 +399,7 @@ private fun AvatarCard(
                         text          = email.ifBlank { "-" },
                         fontSize      = 15.sp,
                         fontWeight    = FontWeight.SemiBold,
-                        color         = TextPrimary,
+                        color         = ui.primaryText,
                         letterSpacing = (-0.2).sp
                     )
                     Spacer(Modifier.height(4.dp))
@@ -388,8 +407,8 @@ private fun AvatarCard(
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(50))
-                            .background(AccentGreen.copy(alpha = 0.12f))
-                            .border(1.dp, AccentGreen.copy(alpha = 0.3f), RoundedCornerShape(50))
+                            .background(ui.positive.copy(alpha = 0.12f))
+                            .border(1.dp, ui.positive.copy(alpha = 0.3f), RoundedCornerShape(50))
                             .padding(horizontal = 10.dp, vertical = 3.dp)
                     ) {
                         Row(
@@ -400,12 +419,12 @@ private fun AvatarCard(
                                 modifier = Modifier
                                     .size(5.dp)
                                     .clip(CircleShape)
-                                    .background(AccentGreen)
+                                    .background(ui.positive)
                             )
                             Text(
                                 text       = "Online",
                                 fontSize   = 11.sp,
-                                color      = AccentGreen,
+                                color      = ui.positive,
                                 fontWeight = FontWeight.SemiBold
                             )
                         }
@@ -420,27 +439,110 @@ private fun AvatarCard(
 
 @Composable
 private fun SectionLabel(text: String) {
+    val ui = financeUiColors()
+
     Text(
         text          = text,
         fontSize      = 11.sp,
         fontWeight    = FontWeight.Medium,
-        color         = TextMuted,
+        color         = ui.mutedText,
         letterSpacing = 1.5.sp,
         modifier      = Modifier.padding(horizontal = 20.dp)
     )
+}
+
+@Composable
+private fun ThemeModeCard(
+    selectedMode: ThemeMode,
+    onThemeModeChange: (ThemeMode) -> Unit
+) {
+    val ui = financeUiColors()
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .background(ui.surface)
+            .border(1.dp, ui.outline, RoundedCornerShape(20.dp))
+            .padding(18.dp)
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Text(
+                text = "Mode Tampilan",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = ui.primaryText
+            )
+            Text(
+                text = "Pilih warna aplikasi: sistem, terang, atau gelap.",
+                fontSize = 12.sp,
+                color = ui.mutedText
+            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                listOf(ThemeMode.SYSTEM, ThemeMode.LIGHT, ThemeMode.DARK).forEach { mode ->
+                    ThemeModeChip(
+                        modifier = Modifier.weight(1f),
+                        label = when (mode) {
+                            ThemeMode.SYSTEM -> "Sistem"
+                            ThemeMode.LIGHT -> "Terang"
+                            ThemeMode.DARK -> "Gelap"
+                        },
+                        isSelected = mode == selectedMode,
+                        onClick = { onThemeModeChange(mode) }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ThemeModeChip(
+    modifier: Modifier = Modifier,
+    label: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    val ui = financeUiColors()
+    val backgroundColor = if (isSelected) ui.accent.copy(alpha = 0.16f) else ui.surfaceAlt.copy(alpha = 0.8f)
+    val borderColor = if (isSelected) ui.accent.copy(alpha = 0.45f) else ui.outline
+    val textColor = if (isSelected) ui.accent else ui.secondaryText
+
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(14.dp))
+            .background(backgroundColor)
+            .border(1.dp, borderColor, RoundedCornerShape(14.dp))
+            .clickableSafe(onClick)
+            .padding(vertical = 12.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = label,
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = textColor
+        )
+    }
 }
 
 // ─── Profile Info Card ────────────────────────────────────────────────────────
 
 @Composable
 private fun ProfileInfoCard(content: @Composable () -> Unit) {
+    val ui = financeUiColors()
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
             .clip(RoundedCornerShape(20.dp))
-            .background(BgCard)
-            .border(1.dp, DividerCol, RoundedCornerShape(20.dp))
+            .background(ui.surface)
+            .border(1.dp, ui.outline, RoundedCornerShape(20.dp))
     ) {
         Column { content() }
     }
@@ -453,8 +555,11 @@ private fun InfoRow(
     icon: ImageVector,
     label: String,
     value: String,
-    valueColor: Color = TextPrimary
+    valueColor: Color = Color.Unspecified
 ) {
+    val ui = financeUiColors()
+    val resolvedValueColor = if (valueColor == Color.Unspecified) ui.primaryText else valueColor
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -465,13 +570,13 @@ private fun InfoRow(
             modifier = Modifier
                 .size(34.dp)
                 .clip(RoundedCornerShape(10.dp))
-                .background(AccentGreen.copy(alpha = 0.1f)),
+                .background(ui.positive.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector        = icon,
                 contentDescription = label,
-                tint               = AccentGreen,
+                tint               = ui.positive,
                 modifier           = Modifier.size(17.dp)
             )
         }
@@ -481,7 +586,7 @@ private fun InfoRow(
         Text(
             text       = label,
             fontSize   = 13.sp,
-            color      = TextSecond,
+            color      = ui.secondaryText,
             fontWeight = FontWeight.Medium,
             modifier   = Modifier.weight(1f)
         )
@@ -489,7 +594,7 @@ private fun InfoRow(
         Text(
             text       = value,
             fontSize   = 13.sp,
-            color      = valueColor,
+            color      = resolvedValueColor,
             fontWeight = FontWeight.SemiBold
         )
     }
@@ -497,12 +602,14 @@ private fun InfoRow(
 
 @Composable
 private fun RowDivider() {
+    val ui = financeUiColors()
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 64.dp)
             .height(1.dp)
-            .background(DividerCol)
+            .background(ui.outline)
     )
 }
 
@@ -510,13 +617,15 @@ private fun RowDivider() {
 
 @Composable
 private fun LogoutButton(isLoading: Boolean, onClick: () -> Unit) {
+    val ui = financeUiColors()
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
             .clip(RoundedCornerShape(16.dp))
-            .background(AccentRed.copy(alpha = 0.1f))
-            .border(1.dp, AccentRed.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
+            .background(ui.negative.copy(alpha = 0.1f))
+            .border(1.dp, ui.negative.copy(alpha = 0.3f), RoundedCornerShape(16.dp))
             .then(
                 if (!isLoading) Modifier.clickableSafe(onClick) else Modifier
             )
@@ -525,7 +634,7 @@ private fun LogoutButton(isLoading: Boolean, onClick: () -> Unit) {
     ) {
         if (isLoading) {
             CircularProgressIndicator(
-                color       = AccentRed,
+                color       = ui.negative,
                 strokeWidth = 2.dp,
                 modifier    = Modifier.size(22.dp)
             )
@@ -537,14 +646,14 @@ private fun LogoutButton(isLoading: Boolean, onClick: () -> Unit) {
                 Icon(
                     imageVector        = Icons.Rounded.Logout,
                     contentDescription = "Logout",
-                    tint               = AccentRed,
+                    tint               = ui.negative,
                     modifier           = Modifier.size(18.dp)
                 )
                 Text(
                     text       = "Keluar dari Akun",
                     fontSize   = 14.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color      = AccentRed
+                    color      = ui.negative
                 )
             }
         }
@@ -559,50 +668,52 @@ private fun LogoutDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
+    val ui = financeUiColors()
+
     AlertDialog(
         onDismissRequest  = { if (!isLoggingOut) onDismiss() },
-        containerColor    = BgCard,
+        containerColor    = ui.surface,
         shape             = RoundedCornerShape(24.dp),
         title = {
             Text(
                 text       = "Keluar dari Akun?",
                 fontSize   = 17.sp,
                 fontWeight = FontWeight.Bold,
-                color      = TextPrimary
+                color      = ui.primaryText
             )
         },
         text = {
             Text(
                 text     = "Kamu akan keluar dari sesi ini. Pastikan data sudah tersimpan.",
                 fontSize = 13.sp,
-                color    = TextSecond
+                color    = ui.secondaryText
             )
         },
         dismissButton = {
             TextButton(onClick = onDismiss, enabled = !isLoggingOut) {
-                Text(text = "Batal", color = TextSecond, fontWeight = FontWeight.Medium)
+                Text(text = "Batal", color = ui.secondaryText, fontWeight = FontWeight.Medium)
             }
         },
         confirmButton = {
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(10.dp))
-                    .background(AccentRed.copy(alpha = 0.15f))
-                    .border(1.dp, AccentRed.copy(alpha = 0.4f), RoundedCornerShape(10.dp))
+                    .background(ui.negative.copy(alpha = 0.15f))
+                    .border(1.dp, ui.negative.copy(alpha = 0.4f), RoundedCornerShape(10.dp))
                     .then(if (!isLoggingOut) Modifier.clickableSafe(onConfirm) else Modifier)
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 contentAlignment = Alignment.Center
             ) {
                 if (isLoggingOut) {
                     CircularProgressIndicator(
-                        color       = AccentRed,
+                        color       = ui.negative,
                         strokeWidth = 2.dp,
                         modifier    = Modifier.size(16.dp)
                     )
                 } else {
                     Text(
                         text       = "Keluar",
-                        color      = AccentRed,
+                        color      = ui.negative,
                         fontWeight = FontWeight.SemiBold,
                         fontSize   = 13.sp
                     )
@@ -616,12 +727,14 @@ private fun LogoutDialog(
 
 @Composable
 private fun ErrorBanner(message: String, modifier: Modifier = Modifier) {
+    val ui = financeUiColors()
+
     Row(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(AccentRed.copy(alpha = 0.1f))
-            .border(1.dp, AccentRed.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
+            .background(ui.negative.copy(alpha = 0.1f))
+            .border(1.dp, ui.negative.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -630,9 +743,9 @@ private fun ErrorBanner(message: String, modifier: Modifier = Modifier) {
             modifier = Modifier
                 .size(8.dp)
                 .clip(CircleShape)
-                .background(AccentRed)
+                .background(ui.negative)
         )
-        Text(text = message, fontSize = 13.sp, color = AccentRed, fontWeight = FontWeight.Medium)
+        Text(text = message, fontSize = 13.sp, color = ui.negative, fontWeight = FontWeight.Medium)
     }
 }
 
@@ -646,3 +759,29 @@ private fun Modifier.clickableSafe(onClick: () -> Unit): Modifier =
             onClick           = onClick
         )
     )
+
+@Preview(showBackground = true, backgroundColor = 0xFFDFDFDF)
+@Composable
+private fun ProfileScreenPreview() {
+    FinanceFreedomTheme(darkTheme = false) {
+        ProfileScreen(
+            authRepository = object : AuthRepository {
+                override suspend fun register(email: String, password: String): Result<UserProfile> =
+                    Result.success(UserProfile(id = "preview", email = email))
+
+                override suspend fun login(email: String, password: String): Result<UserProfile> =
+                    Result.success(UserProfile(id = "preview", email = email))
+
+                override suspend fun me(): Result<UserProfile> =
+                    Result.success(UserProfile(id = "preview", email = "preview@financefreedom.app"))
+
+                override fun isLoggedIn(): Boolean = true
+
+                override fun logout() = Unit
+            },
+            themeMode = ThemeMode.SYSTEM,
+            onThemeModeChange = {},
+            onLogout = {}
+        )
+    }
+}

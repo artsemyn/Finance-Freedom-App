@@ -1,31 +1,53 @@
 package com.example.financefreedom.ui.components
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.text.input.*
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.financefreedom.ui.theme.AppColors
 import com.example.financefreedom.ui.theme.AppType
 
-// ── Primary CTA Button ────────────────────────────────────────────────────────
 @Composable
 fun PrimaryButton(
     text: String,
@@ -42,14 +64,11 @@ fun PrimaryButton(
             .height(56.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(
-                if (enabled)
-                    Brush.horizontalGradient(
-                        listOf(AppColors.Accent, Color(0xFF3A6FD8))
-                    )
-                else
-                    Brush.horizontalGradient(
-                        listOf(AppColors.Tertiary, AppColors.Tertiary)
-                    )
+                if (enabled) {
+                    Brush.horizontalGradient(listOf(AppColors.Accent, Color(0xFF3A6FD8)))
+                } else {
+                    Brush.horizontalGradient(listOf(AppColors.Tertiary, AppColors.Tertiary))
+                }
             )
             .clickable(
                 interactionSource = interactionSource,
@@ -67,9 +86,9 @@ fun PrimaryButton(
             )
         } else {
             Text(
-                text  = text,
+                text = text,
                 style = AppType.BodyMedium.copy(
-                    fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
+                    fontWeight = FontWeight.SemiBold,
                     color = Color.White
                 )
             )
@@ -77,7 +96,6 @@ fun PrimaryButton(
     }
 }
 
-// ── Ghost / Outline Button ────────────────────────────────────────────────────
 @Composable
 fun GhostButton(
     text: String,
@@ -100,13 +118,12 @@ fun GhostButton(
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text  = text,
+            text = text,
             style = AppType.BodyMedium.copy(color = AppColors.Secondary)
         )
     }
 }
 
-// ── Input Field ───────────────────────────────────────────────────────────────
 @Composable
 fun AppTextField(
     value: String,
@@ -123,129 +140,115 @@ fun AppTextField(
     errorMessage: String = ""
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
-    val isFocused = remember { mutableStateOf(false) }
-
-    val borderColor by animateColorAsState(
-        targetValue = when {
-            isError -> AppColors.Negative
-            isFocused.value -> AppColors.Accent
-            else -> AppColors.Outline
-        },
-        animationSpec = tween(200),
-        label = "border"
-    )
 
     Column(modifier = modifier.fillMaxWidth()) {
-        // Label
         Text(
-            text  = label.uppercase(),
+            text = label.uppercase(),
             style = AppType.LabelSmall.copy(color = AppColors.Secondary),
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-        BasicTextField(
+        OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
             singleLine = true,
             textStyle = AppType.BodyMedium.copy(color = AppColors.Primary),
-            cursorBrush = SolidColor(AppColors.Accent),
-            visualTransformation = if (isPassword && !passwordVisible)
-                PasswordVisualTransformation() else VisualTransformation.None,
+            visualTransformation = if (isPassword && !passwordVisible) {
+                PasswordVisualTransformation()
+            } else {
+                VisualTransformation.None
+            },
             keyboardOptions = KeyboardOptions(
                 keyboardType = keyboardType,
-                imeAction    = imeAction
+                imeAction = imeAction
             ),
             keyboardActions = KeyboardActions(
                 onNext = { onImeAction() },
                 onDone = { onImeAction() }
             ),
-            decorationBox = { innerTextField ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(AppColors.SurfaceVariant)
-                        .border(1.dp, borderColor, RoundedCornerShape(14.dp))
-                        .padding(horizontal = 18.dp, vertical = 18.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(Modifier.weight(1f)) {
-                            if (value.isEmpty()) {
-                                Text(
-                                    text  = placeholder,
-                                    style = AppType.BodyMedium.copy(color = AppColors.Tertiary)
-                                )
-                            }
-                            innerTextField()
-                        }
-                        if (isPassword) {
-                            IconButton(
-                                onClick = { passwordVisible = !passwordVisible },
-                                modifier = Modifier.size(20.dp)
-                            ) {
-                                Text(
-                                    text  = if (passwordVisible) "👁" else "👁‍🗨",
-                                    style = AppType.BodySmall.copy(color = AppColors.Secondary)
-                                )
-                            }
-                        } else {
-                            trailingIcon?.invoke()
+            placeholder = {
+                if (placeholder.isNotEmpty()) {
+                    Text(
+                        text = placeholder,
+                        style = AppType.BodyMedium.copy(color = AppColors.Tertiary)
+                    )
+                }
+            },
+            trailingIcon = when {
+                isPassword -> {
+                    {
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Text(
+                                text = if (passwordVisible) "Hide" else "Show",
+                                style = AppType.BodySmall.copy(color = AppColors.Secondary)
+                            )
                         }
                     }
                 }
-            }
+                trailingIcon != null -> trailingIcon
+                else -> null
+            },
+            isError = isError,
+            shape = RoundedCornerShape(14.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = AppColors.SurfaceVariant,
+                unfocusedContainerColor = AppColors.SurfaceVariant,
+                errorContainerColor = AppColors.SurfaceVariant,
+                focusedBorderColor = AppColors.Accent,
+                unfocusedBorderColor = AppColors.Outline,
+                errorBorderColor = AppColors.Negative,
+                cursorColor = AppColors.Accent
+            ),
+            modifier = Modifier.fillMaxWidth()
         )
 
         if (isError && errorMessage.isNotEmpty()) {
             Text(
-                text     = errorMessage,
-                style    = AppType.BodySmall.copy(color = AppColors.Negative),
+                text = errorMessage,
+                style = AppType.BodySmall.copy(color = AppColors.Negative),
                 modifier = Modifier.padding(top = 6.dp, start = 4.dp)
             )
         }
     }
 }
 
-// ── Divider with label ────────────────────────────────────────────────────────
 @Composable
 fun DividerWithLabel(label: String, modifier: Modifier = Modifier) {
     Row(
-        modifier            = modifier.fillMaxWidth(),
-        verticalAlignment   = Alignment.CenterVertically,
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         HorizontalDivider(
-            modifier  = Modifier.weight(1f),
-            color     = AppColors.Outline,
+            modifier = Modifier.weight(1f),
+            color = AppColors.Outline,
             thickness = 1.dp
         )
         Text(
-            text  = label,
+            text = label,
             style = AppType.BodySmall.copy(color = AppColors.Tertiary)
         )
         HorizontalDivider(
-            modifier  = Modifier.weight(1f),
-            color     = AppColors.Outline,
+            modifier = Modifier.weight(1f),
+            color = AppColors.Outline,
             thickness = 1.dp
         )
     }
 }
 
-// ── Subtle animated dot indicator ────────────────────────────────────────────
 @Composable
 fun PulsingDot(modifier: Modifier = Modifier) {
     val infiniteTransition = rememberInfiniteTransition(label = "pulse")
     val scale by infiniteTransition.animateFloat(
-        initialValue   = 0.7f,
-        targetValue    = 1.3f,
-        animationSpec  = infiniteRepeatable(
-            animation  = tween(900, easing = FastOutSlowInEasing),
+        initialValue = 0.7f,
+        targetValue = 1.3f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(900, easing = FastOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         ),
         label = "scale"
     )
+
     Box(
         modifier = modifier
             .size((8 * scale).dp)

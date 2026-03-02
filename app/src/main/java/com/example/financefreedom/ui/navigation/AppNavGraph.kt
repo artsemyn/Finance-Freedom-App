@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.financefreedom.data.local.SessionManager
+import com.example.financefreedom.data.local.ThemeMode
 import com.example.financefreedom.data.repository.AuthRepository
 import com.example.financefreedom.data.repository.TransactionRepository
 import com.example.financefreedom.ui.add.AddScreen
@@ -23,7 +24,9 @@ import com.example.financefreedom.ui.screens.RegisterScreen
 fun AppNavGraph(
     authRepository: AuthRepository,
     transactionRepository: TransactionRepository,
-    sessionManager: SessionManager
+    sessionManager: SessionManager,
+    themeMode: ThemeMode,
+    onThemeModeChange: (ThemeMode) -> Unit
 ) {
     val navController    = rememberNavController()
     val isLoggedIn       = sessionManager.isLoggedInFlow.collectAsState().value
@@ -114,6 +117,8 @@ fun AppNavGraph(
             MainTabsScaffold(navController = navController) {
                 ProfileScreen(
                     authRepository = authRepository,
+                    themeMode = themeMode,
+                    onThemeModeChange = onThemeModeChange,
                     onLogout = {
                         navController.navigate(Routes.ENTRY) {
                             popUpTo(navController.graph.findStartDestination().id) {

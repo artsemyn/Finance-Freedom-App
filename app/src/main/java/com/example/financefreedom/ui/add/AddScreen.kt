@@ -62,24 +62,29 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.financefreedom.data.repository.TransactionRepository
+import com.example.financefreedom.domain.model.MonthlySummary
+import com.example.financefreedom.domain.model.TransactionItem
+import com.example.financefreedom.ui.theme.FinanceFreedomTheme
+import com.example.financefreedom.ui.theme.financeUiColors
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 // ─── Design Tokens ────────────────────────────────────────────────────────────
-private val BgDeep      = Color(0xFF0F1117)
-private val BgCard      = Color(0xFF1E2330)
-private val BgCardAlt   = Color(0xFF232838)
-private val BgInput     = Color(0xFF161A24)
-private val AccentGreen = Color(0xFF34D997)
-private val AccentRed   = Color(0xFFFF6B6B)
-private val TextPrimary = Color(0xFFF0F2F8)
-private val TextSecond  = Color(0xFF8A90A4)
-private val TextMuted   = Color(0xFF565C72)
-private val DividerCol  = Color(0xFF252A38)
+private val BgDeep = Color(0xFFDFDFDF)
+private val BgCard = Color(0xFFF7F7F4)
+private val BgCardAlt = Color(0xFFE8EFE8)
+private val BgInput = Color(0xFFF1F1EC)
+private val AccentGreen = Color(0xFF70AD77)
+private val AccentRed = Color(0xFFB85C5C)
+private val TextPrimary = Color(0xFF193032)
+private val TextSecond = Color(0xFF47615B)
+private val TextMuted = Color(0xFF62716B)
+private val DividerCol = Color(0xFFD0D0CA)
 
 // Backend validates category per transaction type. Use separate lists so income/expense
 // only get valid options (e.g. "Lainnya" is invalid for income on backend).
@@ -124,6 +129,7 @@ private fun parseAmount(amount: String): Double? {
 
 @Composable
 fun AddScreen(transactionRepository: TransactionRepository) {
+    val ui = financeUiColors()
     var isLoading   by remember { mutableStateOf(false) }
     var isSuccess   by remember { mutableStateOf(false) }
     var errorMsg    by remember { mutableStateOf<String?>(null) }
@@ -140,7 +146,7 @@ fun AddScreen(transactionRepository: TransactionRepository) {
 
     val isFormValid = title.isNotBlank() && amount.isNotBlank() && parseAmount(amount) != null && category.isNotBlank()
 
-    Surface(modifier = Modifier.fillMaxSize(), color = BgDeep) {
+    Surface(modifier = Modifier.fillMaxSize(), color = ui.background) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -275,6 +281,8 @@ fun AddScreen(transactionRepository: TransactionRepository) {
 
 @Composable
 private fun AddHeader() {
+    val ui = financeUiColors()
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -287,7 +295,7 @@ private fun AddHeader() {
                 text          = "Tambah",
                 fontSize      = 26.sp,
                 fontWeight    = FontWeight.ExtraBold,
-                color         = TextPrimary,
+                color         = ui.primaryText,
                 letterSpacing = (-0.5).sp
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -295,14 +303,14 @@ private fun AddHeader() {
                     text       = "Transaksi",
                     fontSize   = 26.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color      = AccentGreen,
+                    color      = ui.positive,
                     letterSpacing = (-0.5).sp
                 )
                 Spacer(Modifier.width(8.dp))
                 Icon(
                     imageVector        = Icons.Rounded.Add,
                     contentDescription = null,
-                    tint               = AccentGreen,
+                    tint               = ui.positive,
                     modifier           = Modifier.size(20.dp)
                 )
             }
@@ -312,14 +320,14 @@ private fun AddHeader() {
             modifier = Modifier
                 .size(44.dp)
                 .clip(CircleShape)
-                .background(BgCard)
-                .border(1.dp, DividerCol, CircleShape),
+                .background(ui.surface)
+                .border(1.dp, ui.outline, CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector        = Icons.Rounded.Notes,
                 contentDescription = null,
-                tint               = AccentGreen,
+                tint               = ui.positive,
                 modifier           = Modifier.size(20.dp)
             )
         }
@@ -330,13 +338,15 @@ private fun AddHeader() {
 
 @Composable
 private fun TypeToggle(isIncome: Boolean, onToggle: (Boolean) -> Unit) {
+    val ui = financeUiColors()
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
             .clip(RoundedCornerShape(16.dp))
-            .background(BgCard)
-            .border(1.dp, DividerCol, RoundedCornerShape(16.dp))
+            .background(ui.surface)
+            .border(1.dp, ui.outline, RoundedCornerShape(16.dp))
             .padding(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
@@ -405,13 +415,15 @@ private fun TypeTab(
 
 @Composable
 private fun FormCard(content: @Composable () -> Unit) {
+    val ui = financeUiColors()
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
             .clip(RoundedCornerShape(20.dp))
-            .background(BgCard)
-            .border(1.dp, DividerCol, RoundedCornerShape(20.dp))
+            .background(ui.surface)
+            .border(1.dp, ui.outline, RoundedCornerShape(20.dp))
     ) {
         Column { content() }
     }
@@ -504,12 +516,14 @@ private fun ReadOnlyField(icon: ImageVector, label: String, value: String) {
 
 @Composable
 private fun FieldDivider() {
+    val ui = financeUiColors()
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 66.dp)
             .height(1.dp)
-            .background(DividerCol)
+            .background(ui.outline)
     )
 }
 
@@ -517,6 +531,8 @@ private fun FieldDivider() {
 
 @Composable
 private fun CategoryGrid(options: List<String>, selected: String, onSelected: (String) -> Unit) {
+    val ui = financeUiColors()
+
     Column(
         modifier = Modifier.padding(horizontal = 20.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -529,15 +545,15 @@ private fun CategoryGrid(options: List<String>, selected: String, onSelected: (S
                 rowItems.forEach { cat ->
                     val isSelected   = cat == selected
                     val bgColor by animateColorAsState(
-                        targetValue   = if (isSelected) AccentGreen.copy(alpha = 0.15f) else BgCard,
+                        targetValue   = if (isSelected) ui.positive.copy(alpha = 0.15f) else ui.surface,
                         animationSpec = tween(200), label = "cat_bg_$cat"
                     )
                     val borderColor by animateColorAsState(
-                        targetValue   = if (isSelected) AccentGreen.copy(alpha = 0.5f) else DividerCol,
+                        targetValue   = if (isSelected) ui.positive.copy(alpha = 0.5f) else ui.outline,
                         animationSpec = tween(200), label = "cat_border_$cat"
                     )
                     val textColor by animateColorAsState(
-                        targetValue   = if (isSelected) AccentGreen else TextSecond,
+                        targetValue   = if (isSelected) ui.positive else ui.secondaryText,
                         animationSpec = tween(200), label = "cat_text_$cat"
                     )
 
@@ -572,11 +588,13 @@ private fun CategoryGrid(options: List<String>, selected: String, onSelected: (S
 
 @Composable
 private fun SectionLabel(text: String) {
+    val ui = financeUiColors()
+
     Text(
         text          = text,
         fontSize      = 11.sp,
         fontWeight    = FontWeight.Medium,
-        color         = TextMuted,
+        color         = ui.mutedText,
         letterSpacing = 1.5.sp,
         modifier      = Modifier.padding(horizontal = 20.dp)
     )
@@ -669,5 +687,31 @@ private fun StatusBanner(message: String, isSuccess: Boolean) {
     ) {
         Icon(imageVector = icon, contentDescription = null, tint = color, modifier = Modifier.size(18.dp))
         Text(text = message, fontSize = 13.sp, color = color, fontWeight = FontWeight.Medium)
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFFDFDFDF)
+@Composable
+private fun AddScreenPreview() {
+    FinanceFreedomTheme(darkTheme = false) {
+        AddScreen(
+            transactionRepository = object : TransactionRepository {
+                override suspend fun getTransactions(): Result<List<TransactionItem>> =
+                    Result.success(emptyList())
+
+                override suspend fun createTransaction(
+                    title: String,
+                    amount: Double,
+                    type: String,
+                    category: String,
+                    date: String,
+                    note: String
+                ): Result<TransactionItem> =
+                    Result.success(TransactionItem("preview", title, amount, type, category, date, note))
+
+                override suspend fun getMonthlySummary(month: String): Result<MonthlySummary> =
+                    Result.success(MonthlySummary(0.0, 0.0, 0.0))
+            }
+        )
     }
 }

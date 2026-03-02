@@ -44,11 +44,15 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.financefreedom.data.repository.TransactionRepository
 import com.example.financefreedom.domain.model.MonthlySummary
+import com.example.financefreedom.domain.model.TransactionItem
+import com.example.financefreedom.ui.theme.FinanceFreedomTheme
+import com.example.financefreedom.ui.theme.financeUiColors
 import java.text.NumberFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -56,16 +60,16 @@ import java.util.Locale
 
 // ─── Design Tokens ────────────────────────────────────────────────────────────
 
-private val BgDeep      = Color(0xFF0F1117)
-private val BgCard      = Color(0xFF1E2330)
-private val BgCardAlt   = Color(0xFF232838)
-private val AccentGreen = Color(0xFF34D997)
-private val AccentRed   = Color(0xFFFF6B6B)
-private val AccentBlue  = Color(0xFF6C8EF5)
-private val TextPrimary = Color(0xFFF0F2F8)
-private val TextSecond  = Color(0xFF8A90A4)
-private val TextMuted   = Color(0xFF565C72)
-private val DividerCol  = Color(0xFF252A38)
+private val BgDeep = Color(0xFFDFDFDF)
+private val BgCard = Color(0xFFF7F7F4)
+private val BgCardAlt = Color(0xFFE5ECE6)
+private val AccentGreen = Color(0xFF70AD77)
+private val AccentRed = Color(0xFFB85C5C)
+private val AccentBlue = Color(0xFF0F5257)
+private val TextPrimary = Color(0xFF193032)
+private val TextSecond = Color(0xFF47615B)
+private val TextMuted = Color(0xFF62716B)
+private val DividerCol = Color(0xFFD0D0CA)
 
 private fun formatRupiah(amount: Double): String {
     val fmt = NumberFormat.getNumberInstance(Locale("id", "ID"))
@@ -84,6 +88,7 @@ private fun formatMonthLabel(yyyyMM: String): String {
 
 @Composable
 fun ReportScreen(transactionRepository: TransactionRepository) {
+    val ui = financeUiColors()
     val currentMonth = remember {
         LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"))
     }
@@ -100,7 +105,7 @@ fun ReportScreen(transactionRepository: TransactionRepository) {
 
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = BgDeep
+        color = ui.background
     ) {
         Column(
             modifier = Modifier
@@ -128,6 +133,8 @@ fun ReportScreen(transactionRepository: TransactionRepository) {
 
 @Composable
 private fun ReportHeader(monthLabel: String) {
+    val ui = financeUiColors()
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -140,7 +147,7 @@ private fun ReportHeader(monthLabel: String) {
                 text = "Laporan",
                 fontSize = 26.sp,
                 fontWeight = FontWeight.ExtraBold,
-                color = TextPrimary,
+                color = ui.primaryText,
                 letterSpacing = (-0.5).sp
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -148,7 +155,7 @@ private fun ReportHeader(monthLabel: String) {
                     text = monthLabel,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = TextSecond
+                    color = ui.secondaryText
                 )
             }
         }
@@ -157,14 +164,14 @@ private fun ReportHeader(monthLabel: String) {
             modifier = Modifier
                 .size(44.dp)
                 .clip(CircleShape)
-                .background(BgCard)
-                .border(1.dp, DividerCol, CircleShape),
+                .background(ui.surface)
+                .border(1.dp, ui.outline, CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Rounded.PieChart,
                 contentDescription = null,
-                tint = AccentGreen,
+                tint = ui.accent,
                 modifier = Modifier.size(20.dp)
             )
         }
@@ -236,13 +243,15 @@ private fun DonutChartCard(
     balance: Double,
     isPositive: Boolean
 ) {
+    val ui = financeUiColors()
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
             .clip(RoundedCornerShape(24.dp))
-            .background(BgCard)
-            .border(1.dp, DividerCol, RoundedCornerShape(24.dp))
+            .background(ui.surface)
+            .border(1.dp, ui.outline, RoundedCornerShape(24.dp))
             .padding(28.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -254,7 +263,7 @@ private fun DonutChartCard(
                 text = "DISTRIBUSI BULAN INI",
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Medium,
-                color = TextMuted,
+                color = ui.mutedText,
                 letterSpacing = 1.5.sp
             )
 
@@ -275,7 +284,7 @@ private fun DonutChartCard(
                 CircularProgressIndicator(
                     progress = { 1f },
                     modifier = Modifier.size(160.dp),
-                    color = BgCardAlt,
+                    color = ui.surfaceAlt,
                     strokeWidth = 18.dp,
                     strokeCap = StrokeCap.Round
                 )
@@ -283,7 +292,7 @@ private fun DonutChartCard(
                 CircularProgressIndicator(
                     progress = { animExpense },
                     modifier = Modifier.size(160.dp),
-                    color = AccentRed,
+                    color = ui.negative,
                     strokeWidth = 18.dp,
                     strokeCap = StrokeCap.Round
                 )
@@ -291,7 +300,7 @@ private fun DonutChartCard(
                 CircularProgressIndicator(
                     progress = { animIncome },
                     modifier = Modifier.size(136.dp),
-                    color = AccentGreen,
+                    color = ui.positive,
                     strokeWidth = 18.dp,
                     strokeCap = StrokeCap.Round
                 )
@@ -301,13 +310,13 @@ private fun DonutChartCard(
                     Text(
                         text = if (isPositive) "+" else "-",
                         fontSize = 13.sp,
-                        color = if (isPositive) AccentGreen else AccentRed,
+                        color = if (isPositive) ui.positive else ui.negative,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         text = "Saldo",
                         fontSize = 11.sp,
-                        color = TextMuted
+                        color = ui.mutedText
                     )
                 }
             }
@@ -317,14 +326,14 @@ private fun DonutChartCard(
                 horizontalArrangement = Arrangement.spacedBy(24.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                LegendItem(color = AccentGreen, label = "Pemasukan")
+                LegendItem(color = ui.positive, label = "Pemasukan")
                 Box(
                     modifier = Modifier
                         .width(1.dp)
                         .height(16.dp)
-                        .background(DividerCol)
+                        .background(ui.outline)
                 )
-                LegendItem(color = AccentRed, label = "Pengeluaran")
+                LegendItem(color = ui.negative, label = "Pengeluaran")
             }
         }
     }
@@ -356,11 +365,13 @@ private fun SummaryCard(
     icon: ImageVector,
     accentColor: Color
 ) {
+    val ui = financeUiColors()
+
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(20.dp))
-            .background(BgCard)
-            .border(1.dp, DividerCol, RoundedCornerShape(20.dp))
+            .background(ui.surface)
+            .border(1.dp, ui.outline, RoundedCornerShape(20.dp))
             .padding(18.dp)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -381,7 +392,7 @@ private fun SummaryCard(
             Text(
                 text = label,
                 fontSize = 11.sp,
-                color = TextMuted,
+                color = ui.mutedText,
                 fontWeight = FontWeight.Medium,
                 letterSpacing = 0.5.sp
             )
@@ -403,13 +414,15 @@ private fun ProgressSection(
     totalExpense: Double,
     total: Double
 ) {
+    val ui = financeUiColors()
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
             .clip(RoundedCornerShape(20.dp))
-            .background(BgCard)
-            .border(1.dp, DividerCol, RoundedCornerShape(20.dp))
+            .background(ui.surface)
+            .border(1.dp, ui.outline, RoundedCornerShape(20.dp))
             .padding(20.dp)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -417,7 +430,7 @@ private fun ProgressSection(
                 text = "PROPORSI",
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Medium,
-                color = TextMuted,
+                color = ui.mutedText,
                 letterSpacing = 1.5.sp
             )
             ProgressRow(
@@ -443,6 +456,8 @@ private fun ProgressRow(
     ratio: Float,
     accentColor: Color
 ) {
+    val ui = financeUiColors()
+
     val animRatio by animateFloatAsState(
         targetValue = ratio,
         animationSpec = tween(800),
@@ -454,7 +469,7 @@ private fun ProgressRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = label, fontSize = 12.sp, color = TextSecond, fontWeight = FontWeight.Medium)
+            Text(text = label, fontSize = 12.sp, color = ui.secondaryText, fontWeight = FontWeight.Medium)
             Text(
                 text = "${(ratio * 100).toInt()}%",
                 fontSize = 12.sp,
@@ -468,7 +483,7 @@ private fun ProgressRow(
                 .fillMaxWidth()
                 .height(6.dp)
                 .clip(RoundedCornerShape(50))
-                .background(BgCardAlt)
+                .background(ui.surfaceAlt)
         ) {
             Box(
                 modifier = Modifier
@@ -482,7 +497,7 @@ private fun ProgressRow(
                     )
             )
         }
-        Text(text = formatRupiah(amount), fontSize = 11.sp, color = TextMuted)
+        Text(text = formatRupiah(amount), fontSize = 11.sp, color = ui.mutedText)
     }
 }
 
@@ -490,7 +505,8 @@ private fun ProgressRow(
 
 @Composable
 private fun BalanceRow(balance: Double, isPositive: Boolean) {
-    val accentColor = if (isPositive) AccentGreen else AccentRed
+    val ui = financeUiColors()
+    val accentColor = if (isPositive) ui.positive else ui.negative
 
     Row(
         modifier = Modifier
@@ -525,14 +541,14 @@ private fun BalanceRow(balance: Double, isPositive: Boolean) {
                 Text(
                     text = "SALDO BERSIH",
                     fontSize = 10.sp,
-                    color = TextMuted,
+                    color = ui.mutedText,
                     fontWeight = FontWeight.Medium,
                     letterSpacing = 1.sp
                 )
                 Text(
                     text = if (isPositive) "Surplus bulan ini" else "Defisit bulan ini",
                     fontSize = 12.sp,
-                    color = TextSecond,
+                    color = ui.secondaryText,
                     fontWeight = FontWeight.Medium
                 )
             }
@@ -550,6 +566,8 @@ private fun BalanceRow(balance: Double, isPositive: Boolean) {
 
 @Composable
 private fun LoadingState() {
+    val ui = financeUiColors()
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -557,7 +575,7 @@ private fun LoadingState() {
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator(
-            color = AccentGreen,
+            color = ui.positive,
             strokeWidth = 2.dp,
             modifier = Modifier.size(32.dp)
         )
@@ -568,13 +586,15 @@ private fun LoadingState() {
 
 @Composable
 private fun ErrorBanner(message: String) {
+    val ui = financeUiColors()
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(AccentRed.copy(alpha = 0.1f))
-            .border(1.dp, AccentRed.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
+            .background(ui.negative.copy(alpha = 0.1f))
+            .border(1.dp, ui.negative.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -583,9 +603,9 @@ private fun ErrorBanner(message: String) {
             modifier = Modifier
                 .size(8.dp)
                 .clip(CircleShape)
-                .background(AccentRed)
+                .background(ui.negative)
         )
-        Text(text = message, fontSize = 13.sp, color = AccentRed, fontWeight = FontWeight.Medium)
+        Text(text = message, fontSize = 13.sp, color = ui.negative, fontWeight = FontWeight.Medium)
     }
 }
 
@@ -593,6 +613,8 @@ private fun ErrorBanner(message: String) {
 
 @Composable
 private fun EmptyState() {
+    val ui = financeUiColors()
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -605,13 +627,39 @@ private fun EmptyState() {
             text = "Belum ada ringkasan",
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold,
-            color = TextSecond
+            color = ui.secondaryText
         )
         Text(
             text = "Data laporan bulan ini belum tersedia",
             fontSize = 13.sp,
-            color = TextMuted,
+            color = ui.mutedText,
             textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFFDFDFDF)
+@Composable
+private fun ReportScreenPreview() {
+    FinanceFreedomTheme(darkTheme = false) {
+        ReportScreen(
+            transactionRepository = object : TransactionRepository {
+                override suspend fun getTransactions(): Result<List<TransactionItem>> =
+                    Result.success(emptyList())
+
+                override suspend fun createTransaction(
+                    title: String,
+                    amount: Double,
+                    type: String,
+                    category: String,
+                    date: String,
+                    note: String
+                ): Result<TransactionItem> =
+                    Result.success(TransactionItem("preview", title, amount, type, category, date, note))
+
+                override suspend fun getMonthlySummary(month: String): Result<MonthlySummary> =
+                    Result.success(MonthlySummary(9_200_000.0, 3_450_000.0, 5_750_000.0))
+            }
         )
     }
 }

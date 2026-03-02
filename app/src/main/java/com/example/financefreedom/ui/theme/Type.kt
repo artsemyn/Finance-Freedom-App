@@ -32,3 +32,10 @@ val Typography = Typography(
     )
     */
 )
+
+object AppType {
+    val BodyMedium = Typography.bodyMedium
+    val BodySmall = Typography.bodySmall
+    val LabelSmall = Typography.labelSmall
+    val DisplayMedium = Typography.displayMedium
+}

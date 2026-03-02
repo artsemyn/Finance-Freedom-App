@@ -5,6 +5,8 @@ import com.example.financefreedom.data.remote.FinanceApiService
 import com.example.financefreedom.domain.model.MonthlySummary
 import com.example.financefreedom.domain.model.TransactionItem
 import retrofit2.HttpException
+import java.io.IOException
+import java.net.UnknownHostException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -77,6 +79,12 @@ class TransactionRepositoryImpl(
     private fun <T> Result<T>.mapError(): Result<T> {
         val throwable = exceptionOrNull() ?: return this
         val mapped = when (throwable) {
+            is UnknownHostException -> {
+                IllegalStateException("Host backend tidak dapat dijangkau. Periksa koneksi internet atau konfigurasi DNS perangkat.")
+            }
+            is IOException -> {
+                IllegalStateException("Koneksi jaringan gagal. Periksa internet Anda lalu coba lagi.")
+            }
             is HttpException -> {
                 if (throwable.code() == 401) {
                     IllegalStateException("Sesi berakhir. Silakan login kembali.")

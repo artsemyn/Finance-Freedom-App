@@ -38,13 +38,15 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.financefreedom.ui.theme.financeUiColors
 
 // ─── Design Tokens ────────────────────────────────────────────────────────────
-private val BgDeep      = Color(0xFF0F1117)
-private val BgNavBar    = Color(0xFF13161E)
-private val AccentGreen = Color(0xFF34D997)
-private val TextMuted   = Color(0xFF565C72)
-private val DividerCol  = Color(0xFF1E2330)
+private val BgDeep = Color(0xFFDFDFDF)
+private val BgNavBar = Color(0xFFF7F7F4)
+private val AccentGreen = Color(0xFF70AD77)
+private val TextMuted = Color(0xFF62716B)
+private val DividerCol = Color(0xFFD0D0CA)
+private val AccentDark = Color(0xFF0F5257)
 
 // ─── Scaffold ─────────────────────────────────────────────────────────────────
 
@@ -55,11 +57,12 @@ fun MainTabsScaffold(
 ) {
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
+    val ui = financeUiColors()
 
     Scaffold(
         // Penting: nonaktifkan insets bawaan Scaffold agar tidak bentrok
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        containerColor = BgDeep,
+        containerColor = ui.background,
         bottomBar = {
             CustomBottomNavBar(
                 currentRoute = currentRoute,
@@ -92,17 +95,19 @@ private fun CustomBottomNavBar(
     currentRoute: String?,
     onTabSelected: (String) -> Unit
 ) {
+    val ui = financeUiColors()
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(BgNavBar)
+            .background(ui.surface)
     ) {
         // Garis pembatas tipis di atas nav bar
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(1.dp)
-                .background(DividerCol)
+                .background(ui.outline)
         )
 
         Row(
@@ -140,8 +145,10 @@ private fun RegularTabItem(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
+    val ui = financeUiColors()
+
     val iconColor by animateColorAsState(
-        targetValue   = if (isSelected) AccentGreen else TextMuted,
+        targetValue   = if (isSelected) ui.positive else ui.mutedText,
         animationSpec = tween(250),
         label         = "color_${tab.route}"
     )
@@ -170,7 +177,7 @@ private fun RegularTabItem(
                     modifier = Modifier
                         .size(36.dp)
                         .clip(RoundedCornerShape(10.dp))
-                        .background(AccentGreen.copy(alpha = 0.12f))
+                        .background(ui.positive.copy(alpha = 0.12f))
                 )
             }
             Icon(
@@ -199,8 +206,10 @@ private fun AddTabButton(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
+    val ui = financeUiColors()
+
     val bgColor by animateColorAsState(
-        targetValue   = if (isSelected) AccentGreen else AccentGreen.copy(alpha = 0.9f),
+        targetValue   = if (isSelected) ui.positive else ui.positive.copy(alpha = 0.9f),
         animationSpec = tween(200),
         label         = "add_bg"
     )
@@ -229,7 +238,7 @@ private fun AddTabButton(
         Icon(
             imageVector        = tab.icon,
             contentDescription = tab.title,
-            tint               = BgDeep,
+            tint               = ui.accent,
             modifier           = Modifier.size(26.dp)
         )
     }

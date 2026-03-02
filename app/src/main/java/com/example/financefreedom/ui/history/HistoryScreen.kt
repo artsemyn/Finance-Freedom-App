@@ -49,23 +49,27 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.financefreedom.data.repository.TransactionRepository
+import com.example.financefreedom.domain.model.MonthlySummary
 import com.example.financefreedom.domain.model.TransactionItem
+import com.example.financefreedom.ui.theme.FinanceFreedomTheme
+import com.example.financefreedom.ui.theme.financeUiColors
 import java.text.NumberFormat
 import java.util.Locale
 
 // ─── Design Tokens ────────────────────────────────────────────────────────────
-private val BgDeep      = Color(0xFF0F1117)
-private val BgCard      = Color(0xFF1E2330)
-private val BgCardAlt   = Color(0xFF232838)
-private val AccentGreen = Color(0xFF34D997)
-private val AccentRed   = Color(0xFFFF6B6B)
-private val TextPrimary = Color(0xFFF0F2F8)
-private val TextSecond  = Color(0xFF8A90A4)
-private val TextMuted   = Color(0xFF565C72)
-private val DividerCol  = Color(0xFF252A38)
+private val BgDeep = Color(0xFFDFDFDF)
+private val BgCard = Color(0xFFF7F7F4)
+private val BgCardAlt = Color(0xFFE8EFE8)
+private val AccentGreen = Color(0xFF70AD77)
+private val AccentRed = Color(0xFFB85C5C)
+private val TextPrimary = Color(0xFF193032)
+private val TextSecond = Color(0xFF47615B)
+private val TextMuted = Color(0xFF62716B)
+private val DividerCol = Color(0xFFD0D0CA)
 
 private fun formatRupiah(amount: Double): String {
     val fmt = NumberFormat.getNumberInstance(Locale("id", "ID"))
@@ -81,6 +85,7 @@ private val filterOptions = listOf("Semua", "Pemasukan", "Pengeluaran")
 
 @Composable
 fun HistoryScreen(transactionRepository: TransactionRepository) {
+    val ui = financeUiColors()
     val transactions = remember { mutableStateListOf<TransactionItem>() }
     var isLoading    by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
@@ -101,7 +106,7 @@ fun HistoryScreen(transactionRepository: TransactionRepository) {
         else          -> transactions.toList()
     }
 
-    Surface(modifier = Modifier.fillMaxSize(), color = BgDeep) {
+    Surface(modifier = Modifier.fillMaxSize(), color = ui.background) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -192,6 +197,8 @@ fun HistoryScreen(transactionRepository: TransactionRepository) {
 
 @Composable
 private fun HistoryHeader() {
+    val ui = financeUiColors()
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -204,13 +211,13 @@ private fun HistoryHeader() {
                 text          = "Riwayat",
                 fontSize      = 26.sp,
                 fontWeight    = FontWeight.ExtraBold,
-                color         = TextPrimary,
+                color         = ui.primaryText,
                 letterSpacing = (-0.5).sp
             )
             Text(
                 text       = "Semua aktivitas transaksi",
                 fontSize   = 14.sp,
-                color      = TextSecond,
+                color      = ui.secondaryText,
                 fontWeight = FontWeight.Medium
             )
         }
@@ -218,14 +225,14 @@ private fun HistoryHeader() {
             modifier = Modifier
                 .size(44.dp)
                 .clip(CircleShape)
-                .background(BgCard)
-                .border(1.dp, DividerCol, CircleShape),
+                .background(ui.surface)
+                .border(1.dp, ui.outline, CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector        = Icons.Rounded.History,
                 contentDescription = null,
-                tint               = AccentGreen,
+                tint               = ui.positive,
                 modifier           = Modifier.size(20.dp)
             )
         }
@@ -270,11 +277,13 @@ private fun MiniStatCard(
     color: Color,
     icon: ImageVector
 ) {
+    val ui = financeUiColors()
+
     Row(
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))
-            .background(BgCard)
-            .border(1.dp, DividerCol, RoundedCornerShape(16.dp))
+            .background(ui.surface)
+            .border(1.dp, ui.outline, RoundedCornerShape(16.dp))
             .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -289,7 +298,7 @@ private fun MiniStatCard(
             Icon(imageVector = icon, contentDescription = null, tint = color, modifier = Modifier.size(16.dp))
         }
         Column {
-            Text(text = label, fontSize = 10.sp, color = TextMuted, fontWeight = FontWeight.Medium, letterSpacing = 0.3.sp)
+            Text(text = label, fontSize = 10.sp, color = ui.mutedText, fontWeight = FontWeight.Medium, letterSpacing = 0.3.sp)
             Text(text = formatRupiah(amount), fontSize = 13.sp, fontWeight = FontWeight.Bold, color = color)
         }
     }
@@ -315,16 +324,18 @@ private fun FilterChipsRow(activeFilter: String, onFilterSelected: (String) -> U
 
 @Composable
 private fun FilterChip(label: String, isSelected: Boolean, onClick: () -> Unit) {
+    val ui = financeUiColors()
+
     val bgColor by animateColorAsState(
-        targetValue   = if (isSelected) AccentGreen.copy(alpha = 0.15f) else BgCard,
+        targetValue   = if (isSelected) ui.positive.copy(alpha = 0.15f) else ui.surface,
         animationSpec = tween(200), label = "chip_bg"
     )
     val borderColor by animateColorAsState(
-        targetValue   = if (isSelected) AccentGreen.copy(alpha = 0.5f) else DividerCol,
+        targetValue   = if (isSelected) ui.positive.copy(alpha = 0.5f) else ui.outline,
         animationSpec = tween(200), label = "chip_border"
     )
     val textColor by animateColorAsState(
-        targetValue   = if (isSelected) AccentGreen else TextSecond,
+        targetValue   = if (isSelected) ui.positive else ui.secondaryText,
         animationSpec = tween(200), label = "chip_text"
     )
 
@@ -353,8 +364,9 @@ private fun FilterChip(label: String, isSelected: Boolean, onClick: () -> Unit) 
 
 @Composable
 private fun TransactionRow(trx: TransactionItem, isLast: Boolean) {
+    val ui = financeUiColors()
     val income      = isIncome(trx.type)
-    val accentColor = if (income) AccentGreen else AccentRed
+    val accentColor = if (income) ui.positive else ui.negative
     val initial     = trx.title.firstOrNull()?.uppercaseChar()?.toString() ?: "?"
 
     Column(
@@ -391,7 +403,7 @@ private fun TransactionRow(trx: TransactionItem, isLast: Boolean) {
                         text       = trx.title,
                         fontSize   = 14.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color      = TextPrimary,
+                        color      = ui.primaryText,
                         maxLines   = 1,
                         overflow   = TextOverflow.Ellipsis
                     )
@@ -403,13 +415,13 @@ private fun TransactionRow(trx: TransactionItem, isLast: Boolean) {
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(4.dp))
-                                .background(BgCardAlt)
+                                .background(ui.surfaceAlt)
                                 .padding(horizontal = 6.dp, vertical = 2.dp)
                         ) {
-                            Text(text = trx.category, fontSize = 10.sp, color = TextSecond, fontWeight = FontWeight.Medium)
+                            Text(text = trx.category, fontSize = 10.sp, color = ui.secondaryText, fontWeight = FontWeight.Medium)
                         }
                         Text(text = "·", fontSize = 10.sp, color = TextMuted)
-                        Text(text = trx.date, fontSize = 11.sp, color = TextMuted)
+                        Text(text = trx.date, fontSize = 11.sp, color = ui.mutedText)
                     }
                 }
             }
@@ -424,13 +436,13 @@ private fun TransactionRow(trx: TransactionItem, isLast: Boolean) {
                     color      = accentColor
                 )
                 Spacer(Modifier.height(2.dp))
-                Text(text = trx.type, fontSize = 10.sp, color = TextMuted, fontWeight = FontWeight.Medium)
+                Text(text = trx.type, fontSize = 10.sp, color = ui.mutedText, fontWeight = FontWeight.Medium)
             }
         }
 
         if (!isLast) {
             Divider(
-                color    = DividerCol,
+                color    = ui.outline,
                 thickness = 0.5.dp,
                 modifier = Modifier.padding(start = 54.dp)
             )
@@ -442,18 +454,20 @@ private fun TransactionRow(trx: TransactionItem, isLast: Boolean) {
 
 @Composable
 private fun ErrorBanner(message: String, modifier: Modifier = Modifier) {
+    val ui = financeUiColors()
+
     Row(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(AccentRed.copy(alpha = 0.1f))
-            .border(1.dp, AccentRed.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
+            .background(ui.negative.copy(alpha = 0.1f))
+            .border(1.dp, ui.negative.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(AccentRed))
-        Text(text = message, fontSize = 13.sp, color = AccentRed, fontWeight = FontWeight.Medium)
+        Box(modifier = Modifier.size(8.dp).clip(CircleShape).background(ui.negative))
+        Text(text = message, fontSize = 13.sp, color = ui.negative, fontWeight = FontWeight.Medium)
     }
 }
 
@@ -461,6 +475,8 @@ private fun ErrorBanner(message: String, modifier: Modifier = Modifier) {
 
 @Composable
 private fun EmptyState(isFiltered: Boolean) {
+    val ui = financeUiColors()
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -473,15 +489,47 @@ private fun EmptyState(isFiltered: Boolean) {
             text       = if (isFiltered) "Tidak ada hasil" else "Belum ada transaksi",
             fontSize   = 16.sp,
             fontWeight = FontWeight.SemiBold,
-            color      = TextSecond
+            color      = ui.secondaryText
         )
         Text(
             text      = if (isFiltered) "Coba pilih filter yang lain"
             else "Riwayat transaksi kamu akan muncul di sini",
             fontSize  = 13.sp,
-            color     = TextMuted,
+            color     = ui.mutedText,
             textAlign = TextAlign.Center,
             modifier  = Modifier.padding(horizontal = 32.dp)
+        )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFFDFDFDF)
+@Composable
+private fun HistoryScreenPreview() {
+    FinanceFreedomTheme(darkTheme = false) {
+        HistoryScreen(
+            transactionRepository = object : TransactionRepository {
+                override suspend fun getTransactions(): Result<List<TransactionItem>> =
+                    Result.success(
+                        listOf(
+                            TransactionItem("1", "Gaji", 8_500_000.0, "income", "Gaji", "2026-03-01", null),
+                            TransactionItem("2", "Makan Siang", 55_000.0, "expense", "Makanan", "2026-03-02", null),
+                            TransactionItem("3", "Transport Online", 32_000.0, "expense", "Transport", "2026-03-02", null)
+                        )
+                    )
+
+                override suspend fun createTransaction(
+                    title: String,
+                    amount: Double,
+                    type: String,
+                    category: String,
+                    date: String,
+                    note: String
+                ): Result<TransactionItem> =
+                    Result.success(TransactionItem("preview", title, amount, type, category, date, note))
+
+                override suspend fun getMonthlySummary(month: String): Result<MonthlySummary> =
+                    Result.success(MonthlySummary(8_500_000.0, 87_000.0, 8_413_000.0))
+            }
         )
     }
 }

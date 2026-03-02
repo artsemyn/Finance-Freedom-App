@@ -1,24 +1,24 @@
 package com.example.financefreedom.ui.screens
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,21 +26,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.financefreedom.data.repository.AuthRepository
-import com.example.financefreedom.ui.components.AppTextField
-import com.example.financefreedom.ui.components.PrimaryButton
-import com.example.financefreedom.ui.theme.AppColors
-import com.example.financefreedom.ui.theme.AppType
+import com.example.financefreedom.domain.model.UserProfile
+import com.example.financefreedom.ui.theme.FinanceFreedomTheme
+import com.example.financefreedom.ui.theme.financeUiColors
 import kotlinx.coroutines.launch
 
 @Composable
@@ -50,6 +44,7 @@ fun RegisterScreen(
     onBack: () -> Unit,
     onLogin: () -> Unit
 ) {
+    val ui = financeUiColors()
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
@@ -58,192 +53,224 @@ fun RegisterScreen(
     var passwordError by remember { mutableStateOf("") }
     var confirmPasswordError by remember { mutableStateOf("") }
     var submitError by remember { mutableStateOf("") }
-
-    val focusManager = LocalFocusManager.current
     val scope = rememberCoroutineScope()
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(AppColors.Background)
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = ui.background
     ) {
-        Box(
-            modifier = Modifier
-                .size(320.dp)
-                .align(Alignment.TopEnd)
-                .offset(x = 70.dp, y = (-50).dp)
-                .drawBehind {
-                    drawCircle(
-                        brush = Brush.radialGradient(
-                            listOf(
-                                AppColors.Accent.copy(alpha = 0.1f),
-                                Color.Transparent
-                            )
-                        )
-                    )
-                }
-        )
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .systemBarsPadding()
+                .statusBarsPadding()
+                .imePadding()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 28.dp)
+                .padding(horizontal = 20.dp, vertical = 20.dp),
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Spacer(Modifier.height(20.dp))
-
-            Box(
-                modifier = Modifier
-                    .size(44.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(AppColors.Surface)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = onBack
+            Column {
+                OutlinedButton(
+                    onClick = onBack,
+                    shape = RoundedCornerShape(16.dp),
+                    border = BorderStroke(1.dp, ui.outline),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = ui.surface,
+                        contentColor = ui.primaryText
                     )
-                    .drawBehind {
-                        drawRoundRect(
-                            color = AppColors.Outline,
-                            cornerRadius = androidx.compose.ui.geometry.CornerRadius(12.dp.toPx()),
-                            style = androidx.compose.ui.graphics.drawscope.Stroke(1f)
+                ) {
+                    Text("Kembali")
+                }
+
+                Spacer(Modifier.height(24.dp))
+
+                Text(
+                    text = "Buat Akun Baru",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = ui.primaryText,
+                    fontWeight = FontWeight.ExtraBold
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = "Daftar untuk mulai mengatur transaksi, laporan, dan progres finansialmu.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = ui.secondaryText
+                )
+
+                Spacer(Modifier.height(24.dp))
+
+                Surface(
+                    shape = RoundedCornerShape(24.dp),
+                    color = ui.surface,
+                    tonalElevation = 2.dp,
+                    shadowElevation = 2.dp
+                ) {
+                    Column(
+                        modifier = Modifier.padding(20.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            text = "REGISTER",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = ui.mutedText
                         )
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "<-",
-                    style = AppType.BodyMedium.copy(color = AppColors.Primary)
-                )
-            }
 
-            Spacer(Modifier.height(30.dp))
+                        OutlinedTextField(
+                            value = email,
+                            onValueChange = {
+                                email = it
+                                emailError = ""
+                                submitError = ""
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            label = { Text("Email") },
+                            singleLine = true,
+                            isError = emailError.isNotBlank(),
+                            supportingText = {
+                                if (emailError.isNotBlank()) {
+                                    Text(emailError)
+                                }
+                            },
+                            shape = RoundedCornerShape(18.dp)
+                        )
 
-            Text(
-                text = "Buat Akun",
-                style = AppType.DisplayMedium.copy(color = AppColors.Primary)
-            )
-            Spacer(Modifier.height(8.dp))
-            Text(
-                text = "Daftar gratis untuk mulai kelola keuanganmu.",
-                style = AppType.BodyMedium.copy(color = AppColors.Secondary)
-            )
+                        OutlinedTextField(
+                            value = password,
+                            onValueChange = {
+                                password = it
+                                passwordError = ""
+                                submitError = ""
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            label = { Text("Password") },
+                            singleLine = true,
+                            visualTransformation = PasswordVisualTransformation(),
+                            isError = passwordError.isNotBlank(),
+                            supportingText = {
+                                if (passwordError.isNotBlank()) {
+                                    Text(passwordError)
+                                }
+                            },
+                            shape = RoundedCornerShape(18.dp)
+                        )
 
-            Spacer(Modifier.height(34.dp))
+                        OutlinedTextField(
+                            value = confirmPassword,
+                            onValueChange = {
+                                confirmPassword = it
+                                confirmPasswordError = ""
+                                submitError = ""
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            label = { Text("Konfirmasi Password") },
+                            singleLine = true,
+                            visualTransformation = PasswordVisualTransformation(),
+                            isError = confirmPasswordError.isNotBlank(),
+                            supportingText = {
+                                if (confirmPasswordError.isNotBlank()) {
+                                    Text(confirmPasswordError)
+                                }
+                            },
+                            shape = RoundedCornerShape(18.dp)
+                        )
 
-            AppTextField(
-                value = email,
-                onValueChange = { email = it; emailError = ""; submitError = "" },
-                label = "Email",
-                placeholder = "nama@email.com",
-                keyboardType = KeyboardType.Email,
-                imeAction = ImeAction.Next,
-                isError = emailError.isNotEmpty(),
-                errorMessage = emailError
-            )
-
-            Spacer(Modifier.height(20.dp))
-
-            AppTextField(
-                value = password,
-                onValueChange = { password = it; passwordError = ""; submitError = "" },
-                label = "Password",
-                placeholder = "Minimal 8 karakter",
-                isPassword = true,
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Next,
-                isError = passwordError.isNotEmpty(),
-                errorMessage = passwordError
-            )
-
-            Spacer(Modifier.height(20.dp))
-
-            AppTextField(
-                value = confirmPassword,
-                onValueChange = { confirmPassword = it; confirmPasswordError = ""; submitError = "" },
-                label = "Konfirmasi Password",
-                placeholder = "Ulangi password",
-                isPassword = true,
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Done,
-                onImeAction = { focusManager.clearFocus() },
-                isError = confirmPasswordError.isNotEmpty(),
-                errorMessage = confirmPasswordError
-            )
-
-            if (submitError.isNotEmpty()) {
-                Spacer(Modifier.height(10.dp))
-                Text(
-                    text = submitError,
-                    style = AppType.BodySmall.copy(color = AppColors.Negative)
-                )
-            }
-
-            Spacer(Modifier.height(28.dp))
-
-            PrimaryButton(
-                text = "Daftar gratis",
-                isLoading = isLoading,
-                onClick = {
-                    emailError = ""
-                    passwordError = ""
-                    confirmPasswordError = ""
-                    submitError = ""
-
-                    var valid = true
-                    if (email.isBlank() || !email.contains("@")) {
-                        emailError = "Email tidak valid"
-                        valid = false
-                    }
-                    if (password.length < 8) {
-                        passwordError = "Password minimal 8 karakter"
-                        valid = false
-                    }
-                    if (confirmPassword != password) {
-                        confirmPasswordError = "Konfirmasi password tidak sama"
-                        valid = false
-                    }
-
-                    if (!valid) return@PrimaryButton
-
-                    isLoading = true
-                    scope.launch {
-                        authRepository
-                            .register(email.trim(), password)
-                            .onSuccess { onRegisterSuccess() }
-                            .onFailure {
-                                submitError = it.message ?: "Registrasi gagal, coba lagi."
+                        if (submitError.isNotBlank()) {
+                            Surface(
+                                shape = RoundedCornerShape(16.dp),
+                                color = ui.negative.copy(alpha = 0.1f)
+                            ) {
+                                Text(
+                                    text = submitError,
+                                    color = ui.negative,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    modifier = Modifier.padding(14.dp)
+                                )
                             }
-                        isLoading = false
+                        }
+
+                        Button(
+                            onClick = {
+                                emailError = ""
+                                passwordError = ""
+                                confirmPasswordError = ""
+                                submitError = ""
+
+                                var valid = true
+                                if (email.isBlank() || !email.contains("@")) {
+                                    emailError = "Email tidak valid"
+                                    valid = false
+                                }
+                                if (password.length < 8) {
+                                    passwordError = "Password minimal 8 karakter"
+                                    valid = false
+                                }
+                                if (confirmPassword != password) {
+                                    confirmPasswordError = "Konfirmasi password tidak sama"
+                                    valid = false
+                                }
+                                if (!valid) return@Button
+
+                                isLoading = true
+                                scope.launch {
+                                    authRepository.register(email.trim(), password)
+                                        .onSuccess { onRegisterSuccess() }
+                                        .onFailure { error ->
+                                            submitError = error.message ?: "Registrasi gagal."
+                                        }
+                                    isLoading = false
+                                }
+                            },
+                            enabled = !isLoading,
+                            modifier = Modifier.fillMaxWidth().height(56.dp),
+                            shape = RoundedCornerShape(20.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = ui.accent,
+                                contentColor = ui.onAccent
+                            )
+                        ) {
+                            Text(if (isLoading) "Memproses..." else "Daftar")
+                        }
                     }
                 }
-            )
-
-            Spacer(Modifier.height(20.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Sudah punya akun?",
-                    style = AppType.BodySmall.copy(color = AppColors.Secondary)
-                )
-                Spacer(Modifier.width(4.dp))
-                Text(
-                    text = "Masuk",
-                    style = AppType.BodySmall.copy(color = AppColors.Accent),
-                    modifier = Modifier.clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = onLogin
-                    )
-                )
             }
 
-            Spacer(Modifier.height(32.dp))
+            OutlinedButton(
+                onClick = onLogin,
+                modifier = Modifier.fillMaxWidth().height(54.dp),
+                shape = RoundedCornerShape(20.dp),
+                border = BorderStroke(1.dp, ui.outline),
+                colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = ui.surface,
+                    contentColor = ui.secondaryText
+                )
+            ) {
+                Text("Sudah punya akun? Masuk")
+            }
         }
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFFDFDFDF)
+@Composable
+private fun RegisterScreenPreview() {
+    FinanceFreedomTheme(darkTheme = false) {
+        RegisterScreen(
+            authRepository = object : AuthRepository {
+                override suspend fun register(email: String, password: String): Result<UserProfile> =
+                    Result.success(UserProfile("preview", email))
+
+                override suspend fun login(email: String, password: String): Result<UserProfile> =
+                    Result.success(UserProfile("preview", email))
+
+                override suspend fun me(): Result<UserProfile> =
+                    Result.success(UserProfile("preview", "preview@financefreedom.app"))
+
+                override fun isLoggedIn(): Boolean = false
+
+                override fun logout() = Unit
+            },
+            onRegisterSuccess = {},
+            onBack = {},
+            onLogin = {}
+        )
     }
 }
