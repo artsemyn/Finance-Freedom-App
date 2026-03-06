@@ -40,7 +40,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -684,39 +683,59 @@ private fun LogoutDialog(
         },
         text = {
             Text(
-                text     = "Kamu akan keluar dari sesi ini. Pastikan data sudah tersimpan.",
+                text     = "Akun kamu akan dikeluarkan dari aplikasi ini. Kamu dapat kembali masuk melalui login",
                 fontSize = 13.sp,
                 color    = ui.secondaryText
             )
         },
-        dismissButton = {
-            TextButton(onClick = onDismiss, enabled = !isLoggingOut) {
-                Text(text = "Batal", color = ui.secondaryText, fontWeight = FontWeight.Medium)
-            }
-        },
         confirmButton = {
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(ui.negative.copy(alpha = 0.15f))
-                    .border(1.dp, ui.negative.copy(alpha = 0.4f), RoundedCornerShape(10.dp))
-                    .then(if (!isLoggingOut) Modifier.clickableSafe(onConfirm) else Modifier)
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                contentAlignment = Alignment.Center
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                if (isLoggingOut) {
-                    CircularProgressIndicator(
-                        color       = ui.negative,
-                        strokeWidth = 2.dp,
-                        modifier    = Modifier.size(16.dp)
-                    )
-                } else {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(ui.background)
+                        .border(1.dp, ui.outline, RoundedCornerShape(10.dp))
+                        .then(if (!isLoggingOut) Modifier.clickableSafe(onDismiss) else Modifier)
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
                     Text(
-                        text       = "Keluar",
-                        color      = ui.negative,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize   = 13.sp
+                        text = "Batal",
+                        color = ui.secondaryText,
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 13.sp
                     )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(ui.negative.copy(alpha = 0.15f))
+                        .border(1.dp, ui.negative.copy(alpha = 0.4f), RoundedCornerShape(10.dp))
+                        .then(if (!isLoggingOut) Modifier.clickableSafe(onConfirm) else Modifier)
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (isLoggingOut) {
+                        CircularProgressIndicator(
+                            color       = ui.negative,
+                            strokeWidth = 2.dp,
+                            modifier    = Modifier.size(16.dp)
+                        )
+                    } else {
+                        Text(
+                            text       = "Keluar",
+                            color      = ui.negative,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize   = 13.sp
+                        )
+                    }
                 }
             }
         }

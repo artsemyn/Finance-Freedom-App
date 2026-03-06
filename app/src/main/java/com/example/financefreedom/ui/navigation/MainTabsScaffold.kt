@@ -31,7 +31,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -39,16 +38,6 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.financefreedom.ui.theme.financeUiColors
-
-// ─── Design Tokens ────────────────────────────────────────────────────────────
-private val BgDeep = Color(0xFFDFDFDF)
-private val BgNavBar = Color(0xFFF7F7F4)
-private val AccentGreen = Color(0xFF70AD77)
-private val TextMuted = Color(0xFF62716B)
-private val DividerCol = Color(0xFFD0D0CA)
-private val AccentDark = Color(0xFF0F5257)
-
-// ─── Scaffold ─────────────────────────────────────────────────────────────────
 
 @Composable
 fun MainTabsScaffold(
@@ -60,7 +49,6 @@ fun MainTabsScaffold(
     val ui = financeUiColors()
 
     Scaffold(
-        // Penting: nonaktifkan insets bawaan Scaffold agar tidak bentrok
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         containerColor = ui.background,
         bottomBar = {
@@ -88,8 +76,6 @@ fun MainTabsScaffold(
     }
 }
 
-// ─── Custom Bottom Nav Bar ────────────────────────────────────────────────────
-
 @Composable
 private fun CustomBottomNavBar(
     currentRoute: String?,
@@ -102,7 +88,6 @@ private fun CustomBottomNavBar(
             .fillMaxWidth()
             .background(ui.surface)
     ) {
-        // Garis pembatas tipis di atas nav bar
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -113,31 +98,21 @@ private fun CustomBottomNavBar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .windowInsetsPadding(WindowInsets.navigationBars) // gesture nav bar
+                .windowInsetsPadding(WindowInsets.navigationBars)
                 .padding(horizontal = 8.dp, vertical = 10.dp),
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
             bottomTabs.forEach { tab ->
-                if (tab.route == Routes.ADD) {
-                    AddTabButton(
-                        tab        = tab,
-                        isSelected = currentRoute == tab.route,
-                        onClick    = { onTabSelected(tab.route) }
-                    )
-                } else {
-                    RegularTabItem(
-                        tab        = tab,
-                        isSelected = currentRoute == tab.route,
-                        onClick    = { onTabSelected(tab.route) }
-                    )
-                }
+                RegularTabItem(
+                    tab = tab,
+                    isSelected = currentRoute == tab.route,
+                    onClick = { onTabSelected(tab.route) }
+                )
             }
         }
     }
 }
-
-// ─── Regular Tab ──────────────────────────────────────────────────────────────
 
 @Composable
 private fun RegularTabItem(
@@ -148,14 +123,14 @@ private fun RegularTabItem(
     val ui = financeUiColors()
 
     val iconColor by animateColorAsState(
-        targetValue   = if (isSelected) ui.positive else ui.mutedText,
+        targetValue = if (isSelected) ui.positive else ui.mutedText,
         animationSpec = tween(250),
-        label         = "color_${tab.route}"
+        label = "color_${tab.route}"
     )
     val scale by animateFloatAsState(
-        targetValue   = if (isSelected) 1f else 0.9f,
+        targetValue = if (isSelected) 1f else 0.9f,
         animationSpec = spring(stiffness = Spring.StiffnessMedium),
-        label         = "scale_${tab.route}"
+        label = "scale_${tab.route}"
     )
 
     Column(
@@ -163,8 +138,8 @@ private fun RegularTabItem(
             .clip(RoundedCornerShape(12.dp))
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
-                indication        = null,
-                onClick           = onClick
+                indication = null,
+                onClick = onClick
             )
             .padding(horizontal = 16.dp, vertical = 6.dp)
             .scale(scale),
@@ -181,65 +156,19 @@ private fun RegularTabItem(
                 )
             }
             Icon(
-                imageVector        = tab.icon,
+                imageVector = tab.icon,
                 contentDescription = tab.title,
-                tint               = iconColor,
-                modifier           = Modifier.size(22.dp)
+                tint = iconColor,
+                modifier = Modifier.size(22.dp)
             )
         }
 
         Text(
-            text          = tab.title,
-            fontSize      = 10.sp,
-            fontWeight    = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-            color         = iconColor,
+            text = tab.title,
+            fontSize = 10.sp,
+            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+            color = iconColor,
             letterSpacing = 0.3.sp
-        )
-    }
-}
-
-// ─── Add (FAB-style) Tab ──────────────────────────────────────────────────────
-
-@Composable
-private fun AddTabButton(
-    tab: BottomTab,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    val ui = financeUiColors()
-
-    val bgColor by animateColorAsState(
-        targetValue   = if (isSelected) ui.positive else ui.positive.copy(alpha = 0.9f),
-        animationSpec = tween(200),
-        label         = "add_bg"
-    )
-    val scale by animateFloatAsState(
-        targetValue   = if (isSelected) 1.08f else 1f,
-        animationSpec = spring(
-            stiffness    = Spring.StiffnessMediumLow,
-            dampingRatio = Spring.DampingRatioMediumBouncy
-        ),
-        label         = "add_scale"
-    )
-
-    Box(
-        modifier = Modifier
-            .size(52.dp)
-            .scale(scale)
-            .clip(RoundedCornerShape(16.dp))
-            .background(bgColor)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication        = null,
-                onClick           = onClick
-            ),
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            imageVector        = tab.icon,
-            contentDescription = tab.title,
-            tint               = ui.accent,
-            modifier           = Modifier.size(26.dp)
         )
     }
 }

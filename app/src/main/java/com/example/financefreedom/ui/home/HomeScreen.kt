@@ -1,17 +1,8 @@
-package com.example.financefreedom.ui.home
+﻿package com.example.financefreedom.ui.home
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,121 +14,58 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowDownward
-import androidx.compose.material.icons.rounded.ArrowUpward
+import androidx.compose.material.icons.automirrored.rounded.ArrowForward
+import androidx.compose.material.icons.automirrored.rounded.TrendingUp
 import androidx.compose.material.icons.rounded.Refresh
-import androidx.compose.material.icons.rounded.TrendingUp
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material.icons.rounded.Savings
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.financefreedom.data.repository.SavingsRepository
 import com.example.financefreedom.data.repository.TransactionRepository
-import com.example.financefreedom.domain.model.TransactionItem
 import com.example.financefreedom.domain.model.MonthlySummary
+import com.example.financefreedom.domain.model.SavingsGoal
+import com.example.financefreedom.domain.model.TransactionItem
 import com.example.financefreedom.ui.theme.FinanceFreedomTheme
 import com.example.financefreedom.ui.theme.financeCardGradient
 import com.example.financefreedom.ui.theme.financeUiColors
-import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
 
-// ─── Design Tokens ───────────────────────────────────────────────────────────
-
-private val BgDeep = Color(0xFFDFDFDF)
-private val BgSurface = Color(0xFFF1F1EC)
-private val BgCard = Color(0xFFF7F7F4)
-private val BgCardAlt = Color(0xFFE8EFE8)
-private val AccentGreen = Color(0xFF70AD77)
-private val AccentRed = Color(0xFFB85C5C)
-private val AccentBlue = Color(0xFF0F5257)
-private val TextPrimary = Color(0xFF193032)
-private val TextSecond = Color(0xFF47615B)
-private val TextMuted = Color(0xFF62716B)
-private val DividerCol = Color(0xFFD0D0CA)
-
-private val GreenGradient = Brush.horizontalGradient(
-    listOf(Color(0xFF70AD77), Color(0xFF5E9665))
-)
-private val CardGradient = Brush.verticalGradient(
-    listOf(Color(0xFFF7F7F4), Color(0xFFEFEFE8))
-)
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-private fun formatRupiah(amount: Double): String {
-    val fmt = NumberFormat.getNumberInstance(Locale("id", "ID"))
-    return "Rp ${fmt.format(amount)}"
-}
-
-private fun isIncome(type: String) =
-    type.lowercase() in listOf("income", "pemasukan", "kredit", "credit")
-
-// ─── Main Screen ─────────────────────────────────────────────────────────────
-
 @Composable
-fun HomeScreen(transactionRepository: TransactionRepository) {
+fun HomeScreen(
+    transactionRepository: TransactionRepository,
+    savingsRepository: SavingsRepository,
+    onOpenSavings: () -> Unit,
+    onOpenAdd: () -> Unit
+) {
     val ui = financeUiColors()
-    val transactions = remember { mutableStateListOf<TransactionItem>() }
-    var isLoading by remember { mutableStateOf(true) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-    val scope = rememberCoroutineScope()
-
-    val rotateAnim by animateFloatAsState(
-        targetValue = if (isLoading) 360f else 0f,
-        animationSpec = tween(600),
-        label = "refresh_rotate"
+    val viewModel: HomeViewModel = viewModel(
+        factory = HomeViewModelFactory(
+            transactionRepository = transactionRepository,
+            savingsRepository = savingsRepository
+        )
     )
-
-    fun refresh() {
-        scope.launch {
-            isLoading = true
-            errorMessage = null
-            val result = transactionRepository.getTransactions()
-            isLoading = false
-            result.onSuccess {
-                transactions.clear()
-                transactions.addAll(it)
-            }.onFailure { errorMessage = it.message }
-        }
-    }
-
-    LaunchedEffect(Unit) { refresh() }
-
-    // Summary computed values
-    val totalIncome  = transactions.filter { isIncome(it.type) }.sumOf { it.amount }
-    val totalExpense = transactions.filter { !isIncome(it.type) }.sumOf { it.amount }
-    val netBalance   = totalIncome - totalExpense
+    val state by viewModel.uiState.collectAsState()
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -147,113 +75,127 @@ fun HomeScreen(transactionRepository: TransactionRepository) {
             modifier = Modifier
                 .fillMaxSize()
                 .statusBarsPadding(),
-            verticalArrangement = Arrangement.spacedBy(0.dp)
+            verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            // ── Header ────────────────────────────────────────────────────
             item {
-                HomeHeader(
-                    isLoading = isLoading,
-                    rotateAnim = rotateAnim,
-                    onRefresh = { refresh() }
+                Header(
+                    isRefreshing = state.isRefreshing,
+                    onRefresh = { viewModel.refresh() }
                 )
             }
 
-            // ── Balance Card ──────────────────────────────────────────────
             item {
-                AnimatedContent(
-                    targetState = isLoading,
-                    transitionSpec = { fadeIn(tween(400)) togetherWith fadeOut(tween(200)) },
-                    label = "balance_anim"
-                ) { loading ->
-                    if (loading) {
+                BalanceCard(
+                    netBalance = state.netBalance,
+                    totalIncome = state.totalIncome,
+                    totalExpense = state.totalExpense
+                )
+            }
+
+            item {
+                SavingsOverviewCard(
+                    savingsGoals = state.savingsGoals,
+                    totalCurrent = state.totalSavingsCurrent,
+                    totalTarget = state.totalSavingsTarget,
+                    progress = state.overallSavingsProgress,
+                    onOpenSavings = onOpenSavings
+                )
+            }
+            item {
+                QuickActionsCard(onOpenAdd = onOpenAdd)
+            }
+
+            if (!state.errorMessage.isNullOrBlank()) {
+                item {
+                    MessageBanner(
+                        message = state.errorMessage.orEmpty(),
+                        isError = true
+                    )
+                }
+            }
+
+            when {
+                state.isLoading -> {
+                    item {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 20.dp)
-                                .height(160.dp),
+                                .padding(vertical = 24.dp),
                             contentAlignment = Alignment.Center
                         ) {
                             CircularProgressIndicator(
-                                color = AccentGreen,
-                                strokeWidth = 2.dp,
-                                modifier = Modifier.size(32.dp)
+                                color = ui.positive,
+                                modifier = Modifier.size(32.dp),
+                                strokeWidth = 2.dp
                             )
                         }
-                    } else {
-                        BalanceCard(
-                            netBalance = netBalance,
-                            totalIncome = totalIncome,
-                            totalExpense = totalExpense
+                    }
+                }
+
+                state.transactions.isEmpty() -> {
+                    item {
+                        MessageBanner(
+                            message = "Belum ada transaksi. Tambahkan data lewat tombol tambah di Home.",
+                            isError = false
                         )
                     }
                 }
-                Spacer(Modifier.height(24.dp))
-            }
 
-            // ── Error State ───────────────────────────────────────────────
-            if (!errorMessage.isNullOrBlank()) {
-                item {
-                    ErrorBanner(message = errorMessage.orEmpty())
-                    Spacer(Modifier.height(16.dp))
-                }
-            }
-
-            // ── Section Header ────────────────────────────────────────────
-            if (!isLoading) {
-                item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                else -> {
+                    item {
                         Text(
-                            text = "Riwayat Transaksi",
+                            text = "Transaksi Terbaru",
+                            modifier = Modifier.padding(horizontal = 20.dp),
                             fontSize = 13.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = TextSecond,
-                            letterSpacing = 1.2.sp
-                        )
-                        Text(
-                            text = "${transactions.size} transaksi",
-                            fontSize = 12.sp,
-                            color = ui.mutedText
+                            color = ui.secondaryText
                         )
                     }
-                    Spacer(Modifier.height(12.dp))
+                    items(state.transactions.take(6)) { transaction ->
+                        TransactionRow(transaction = transaction)
+                    }
                 }
             }
 
-            // ── Empty State ───────────────────────────────────────────────
-            if (!isLoading && transactions.isEmpty() && errorMessage.isNullOrBlank()) {
-                item { EmptyState() }
-            }
-
-            // ── Transaction Items ─────────────────────────────────────────
-            itemsIndexed(transactions) { index, trx ->
-                TransactionRow(
-                    trx = trx,
-                    index = index,
-                    isLast = index == transactions.lastIndex
-                )
-            }
-
-            item { Spacer(Modifier.height(32.dp)) }
+            item { Spacer(modifier = Modifier.height(20.dp)) }
         }
     }
 }
 
-// ─── Header Component ─────────────────────────────────────────────────────────
+@Composable
+private fun QuickActionsCard(onOpenAdd: () -> Unit) {
+    val ui = financeUiColors()
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+            .clip(RoundedCornerShape(24.dp))
+            .background(ui.surface)
+            .border(1.dp, ui.outline, RoundedCornerShape(24.dp))
+            .padding(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Text("Quick Action", fontWeight = FontWeight.SemiBold, color = ui.primaryText)
+                Text("Catat transaksi baru", fontSize = 12.sp, color = ui.secondaryText)
+            }
+            Button(onClick = onOpenAdd) {
+                Text("Tambah transaksi")
+            }
+        }
+    }
+}
 
 @Composable
-private fun HomeHeader(
-    isLoading: Boolean,
-    rotateAnim: Float,
+private fun Header(
+    isRefreshing: Boolean,
     onRefresh: () -> Unit
 ) {
     val ui = financeUiColors()
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -263,30 +205,17 @@ private fun HomeHeader(
     ) {
         Column {
             Text(
-                text = "Finance",
+                text = "Finance Freedom",
                 fontSize = 26.sp,
                 fontWeight = FontWeight.ExtraBold,
-                color = ui.accent,
-                letterSpacing = (-0.5).sp
+                color = ui.primaryText
             )
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = "Freedom",
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = ui.positive,
-                    letterSpacing = (-0.5).sp
-                )
-                Spacer(Modifier.width(8.dp))
-                Icon(
-                    imageVector = Icons.Rounded.TrendingUp,
-                    contentDescription = null,
-                    tint = ui.positive,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
+            Text(
+                text = "Ringkasan keuangan dan tabungan",
+                fontSize = 13.sp,
+                color = ui.secondaryText
+            )
         }
-
         Box(
             modifier = Modifier
                 .size(44.dp)
@@ -295,25 +224,16 @@ private fun HomeHeader(
                 .border(1.dp, ui.outline, CircleShape),
             contentAlignment = Alignment.Center
         ) {
-            IconButton(
-                onClick = onRefresh,
-                enabled = !isLoading,
-                modifier = Modifier.size(44.dp)
-            ) {
+            IconButton(onClick = onRefresh, enabled = !isRefreshing) {
                 Icon(
-                    imageVector = Icons.Rounded.Refresh,
+                    imageVector = if (isRefreshing) Icons.AutoMirrored.Rounded.TrendingUp else Icons.Rounded.Refresh,
                     contentDescription = "Refresh",
-                    tint = if (isLoading) ui.mutedText else ui.positive,
-                    modifier = Modifier
-                        .size(20.dp)
-                        .rotate(rotateAnim)
+                    tint = if (isRefreshing) ui.mutedText else ui.positive
                 )
             }
         }
     }
 }
-
-// ─── Balance Card ────────────────────────────────────────────────────────────
 
 @Composable
 private fun BalanceCard(
@@ -322,60 +242,33 @@ private fun BalanceCard(
     totalExpense: Double
 ) {
     val ui = financeUiColors()
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
             .clip(RoundedCornerShape(24.dp))
             .background(financeCardGradient())
-            .border(
-                width = 1.dp,
-                color = ui.outline,
-                shape = RoundedCornerShape(24.dp)
-            )
+            .border(1.dp, ui.outline, RoundedCornerShape(24.dp))
+            .padding(22.dp)
     ) {
-        Column(modifier = Modifier.padding(24.dp)) {
-            Text(
-                text = "SALDO BERSIH",
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Medium,
-                color = ui.mutedText,
-                letterSpacing = 1.5.sp
-            )
-            Spacer(Modifier.height(6.dp))
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text(text = "Saldo Bersih", fontSize = 12.sp, color = ui.mutedText)
             Text(
                 text = formatRupiah(netBalance),
-                fontSize = 32.sp,
+                fontSize = 30.sp,
                 fontWeight = FontWeight.ExtraBold,
-                color = if (netBalance >= 0) ui.accent else ui.negative,
-                letterSpacing = (-0.5).sp
+                color = if (netBalance >= 0) ui.accent else ui.negative
             )
-
-            Spacer(Modifier.height(20.dp))
-            Divider(color = ui.outline, thickness = 1.dp)
-            Spacer(Modifier.height(20.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                BalanceStat(
-                    label = "Pemasukan",
-                    amount = totalIncome,
-                    isIncome = true
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                Text(
+                    text = "Masuk: ${formatRupiah(totalIncome)}",
+                    fontSize = 12.sp,
+                    color = ui.positive
                 )
-                // Vertical divider
-                Box(
-                    modifier = Modifier
-                        .width(1.dp)
-                        .height(40.dp)
-                        .background(ui.outline)
-                )
-                BalanceStat(
-                    label = "Pengeluaran",
-                    amount = totalExpense,
-                    isIncome = false
+                Text(
+                    text = "Keluar: ${formatRupiah(totalExpense)}",
+                    fontSize = 12.sp,
+                    color = ui.negative
                 )
             }
         }
@@ -383,276 +276,240 @@ private fun BalanceCard(
 }
 
 @Composable
-private fun BalanceStat(
-    label: String,
-    amount: Double,
-    isIncome: Boolean
+private fun SavingsOverviewCard(
+    savingsGoals: List<SavingsGoal>,
+    totalCurrent: Double,
+    totalTarget: Double,
+    progress: Float,
+    onOpenSavings: () -> Unit
 ) {
     val ui = financeUiColors()
-    val accentColor = if (isIncome) ui.positive else ui.negative
-    val icon = if (isIncome) Icons.Rounded.ArrowDownward else Icons.Rounded.ArrowUpward
-
-    Column(horizontalAlignment = if (isIncome) Alignment.Start else Alignment.End) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            if (!isIncome) {
-                // Spacer for right-aligned
-            }
-            Box(
-                modifier = Modifier
-                    .size(18.dp)
-                    .clip(CircleShape)
-                    .background(accentColor.copy(alpha = 0.15f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = accentColor,
-                    modifier = Modifier.size(10.dp)
-                )
-            }
-            Text(
-                text = label,
-                fontSize = 11.sp,
-                color = ui.mutedText,
-                fontWeight = FontWeight.Medium,
-                letterSpacing = 0.3.sp
-            )
-        }
-        Spacer(Modifier.height(4.dp))
-        Text(
-            text = formatRupiah(amount),
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Bold,
-            color = accentColor
-        )
-    }
-}
-
-// ─── Transaction Row ──────────────────────────────────────────────────────────
-
-@Composable
-private fun TransactionRow(
-    trx: TransactionItem,
-    index: Int,
-    isLast: Boolean
-) {
-    val ui = financeUiColors()
-    val income = isIncome(trx.type)
-    val accentColor = if (income) ui.positive else ui.negative
-    val initial = trx.title.firstOrNull()?.uppercaseChar()?.toString() ?: "?"
-
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
+            .clip(RoundedCornerShape(24.dp))
+            .background(ui.surface)
+            .border(1.dp, ui.outline, RoundedCornerShape(24.dp))
+            .clickable(onClick = onOpenSavings)
+            .padding(18.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 14.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Icon + Info
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Avatar circle
-                Box(
-                    modifier = Modifier
-                        .size(42.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(accentColor.copy(alpha = 0.12f))
-                        .border(
-                            1.dp,
-                            accentColor.copy(alpha = 0.25f),
-                            RoundedCornerShape(12.dp)
-                        ),
-                    contentAlignment = Alignment.Center
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = initial,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = accentColor
+                    Icon(
+                        imageVector = Icons.Rounded.Savings,
+                        contentDescription = null,
+                        tint = ui.positive
                     )
-                }
-
-                Spacer(Modifier.width(12.dp))
-
-                Column {
                     Text(
-                        text = trx.title,
+                        text = "Savings Goals",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = ui.primaryText,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        color = ui.primaryText
                     )
-                    Spacer(Modifier.height(2.dp))
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        CategoryChip(text = trx.category)
-                        Text(
-                            text = "·",
-                            fontSize = 10.sp,
-                            color = ui.mutedText
-                        )
-                        Text(
-                            text = trx.date,
-                            fontSize = 11.sp,
-                            color = TextMuted
-                        )
-                    }
                 }
-            }
-
-            Spacer(Modifier.width(12.dp))
-
-            // Amount
-            Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    text = "${if (income) "+" else "-"}${formatRupiah(trx.amount)}",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = accentColor
-                )
-                Spacer(Modifier.height(2.dp))
-                Text(
-                    text = trx.type,
-                    fontSize = 10.sp,
-                    color = ui.mutedText,
-                    fontWeight = FontWeight.Medium
+                Icon(
+                    imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
+                    contentDescription = "Open savings",
+                    tint = ui.mutedText
                 )
             }
-        }
 
-        if (!isLast) {
-            Divider(
-                color = ui.outline,
-                thickness = 0.5.dp,
-                modifier = Modifier.padding(start = 54.dp)
+            Text(
+                text = if (savingsGoals.isEmpty()) {
+                    "Belum ada target tabungan"
+                } else {
+                    "${savingsGoals.size} target aktif"
+                },
+                fontSize = 12.sp,
+                color = ui.secondaryText
+            )
+            Text(
+                text = "${formatRupiah(totalCurrent)} / ${formatRupiah(totalTarget)}",
+                fontSize = 13.sp,
+                color = ui.primaryText,
+                fontWeight = FontWeight.Medium
+            )
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(10.dp)
+                    .clip(RoundedCornerShape(50))
+                    .background(ui.surfaceAlt)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(progress.coerceIn(0f, 1f))
+                        .height(10.dp)
+                        .clip(RoundedCornerShape(50))
+                        .background(ui.positive)
+                )
+            }
+
+            Text(
+                text = "Progress total: ${(progress * 100).toInt()}%",
+                fontSize = 12.sp,
+                color = ui.mutedText
             )
         }
     }
 }
 
-// ─── Category Chip ────────────────────────────────────────────────────────────
-
 @Composable
-private fun CategoryChip(text: String) {
+private fun TransactionRow(transaction: TransactionItem) {
     val ui = financeUiColors()
-
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(4.dp))
-            .background(ui.surfaceAlt)
-            .padding(horizontal = 6.dp, vertical = 2.dp)
-    ) {
-        Text(
-            text = text,
-            fontSize = 10.sp,
-            color = ui.secondaryText,
-            fontWeight = FontWeight.Medium
-        )
-    }
-}
-
-// ─── Error Banner ────────────────────────────────────────────────────────────
-
-@Composable
-private fun ErrorBanner(message: String) {
-    val ui = financeUiColors()
+    val income = transaction.type.lowercase() in listOf("income", "pemasukan", "kredit", "credit")
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(ui.negative.copy(alpha = 0.1f))
-            .border(1.dp, ui.negative.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+            .clip(RoundedCornerShape(18.dp))
+            .background(ui.surface)
+            .border(1.dp, ui.outline, RoundedCornerShape(18.dp))
+            .padding(horizontal = 14.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(
-            modifier = Modifier
-                .size(8.dp)
-                .clip(CircleShape)
-                .background(ui.negative)
-        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = transaction.title.ifBlank { "Tanpa judul" },
+                fontWeight = FontWeight.SemiBold,
+                color = ui.primaryText,
+                fontSize = 14.sp
+            )
+            Text(
+                text = "${transaction.category} • ${transaction.date}",
+                color = ui.secondaryText,
+                fontSize = 12.sp
+            )
+        }
         Text(
-            text = message,
-            fontSize = 13.sp,
-            color = ui.negative,
-            fontWeight = FontWeight.Medium
+            text = (if (income) "+ " else "- ") + formatRupiah(transaction.amount),
+            color = if (income) ui.positive else ui.negative,
+            fontWeight = FontWeight.Bold,
+            fontSize = 13.sp
         )
     }
 }
 
-// ─── Empty State ─────────────────────────────────────────────────────────────
-
 @Composable
-private fun EmptyState() {
+private fun MessageBanner(message: String, isError: Boolean) {
     val ui = financeUiColors()
-
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 48.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+            .padding(horizontal = 20.dp)
+            .clip(RoundedCornerShape(16.dp))
+            .background(if (isError) ui.negative.copy(alpha = 0.14f) else ui.surface)
+            .border(1.dp, ui.outline, RoundedCornerShape(16.dp))
+            .padding(horizontal = 14.dp, vertical = 12.dp)
     ) {
-        Text(text = "•", fontSize = 28.sp, color = AccentBlue)
         Text(
-            text = "Belum ada transaksi",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = ui.secondaryText
-        )
-        Text(
-            text = "Transaksi kamu akan tampil di sini",
-            fontSize = 13.sp,
-            color = ui.mutedText
+            text = message,
+            color = if (isError) ui.negative else ui.secondaryText,
+            fontSize = 12.sp
         )
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFFDFDFDF)
+private fun formatRupiah(amount: Double): String {
+    val fmt = NumberFormat.getNumberInstance(Locale.forLanguageTag("id-ID"))
+    return "Rp ${fmt.format(amount)}"
+}
+
+@Preview(showBackground = true)
 @Composable
 private fun HomeScreenPreview() {
-    FinanceFreedomTheme(darkTheme = false) {
-        HomeScreen(
-            transactionRepository = object : TransactionRepository {
-                override suspend fun getTransactions(): Result<List<TransactionItem>> =
-                    Result.success(
-                        listOf(
-                            TransactionItem("1", "Gaji Bulanan", 8_500_000.0, "income", "Gaji", "2026-03-01", null),
-                            TransactionItem("2", "Belanja Bulanan", 1_250_000.0, "expense", "Belanja", "2026-03-02", null),
-                            TransactionItem("3", "Transport", 150_000.0, "expense", "Transport", "2026-03-02", null)
-                        )
+    val fakeTransactionRepository = object : TransactionRepository {
+        override suspend fun getTransactions(): Result<List<TransactionItem>> {
+            return Result.success(
+                listOf(
+                    TransactionItem(
+                        id = "1",
+                        title = "Gaji",
+                        amount = 7000000.0,
+                        type = "income",
+                        category = "Salary",
+                        date = "2026-03-01",
+                        note = null
+                    ),
+                    TransactionItem(
+                        id = "2",
+                        title = "Belanja Bulanan",
+                        amount = 1200000.0,
+                        type = "expense",
+                        category = "Groceries",
+                        date = "2026-03-03",
+                        note = null
                     )
+                )
+            )
+        }
 
-                override suspend fun createTransaction(
-                    title: String,
-                    amount: Double,
-                    type: String,
-                    category: String,
-                    date: String,
-                    note: String
-                ): Result<TransactionItem> =
-                    Result.success(TransactionItem("preview", title, amount, type, category, date, note))
+        override suspend fun createTransaction(
+            title: String,
+            amount: Double,
+            type: String,
+            category: String,
+            date: String,
+            note: String
+        ): Result<TransactionItem> = Result.failure(UnsupportedOperationException())
 
-                override suspend fun getMonthlySummary(month: String): Result<MonthlySummary> =
-                    Result.success(MonthlySummary(8_500_000.0, 1_400_000.0, 7_100_000.0))
-            }
+        override suspend fun getMonthlySummary(month: String): Result<MonthlySummary> {
+            return Result.success(MonthlySummary(0.0, 0.0, 0.0))
+        }
+    }
+
+    val fakeSavingsRepository = object : SavingsRepository {
+        override suspend fun getSavingsGoals(): Result<List<SavingsGoal>> {
+            return Result.success(
+                listOf(
+                    SavingsGoal(
+                        id = "sv1",
+                        title = "Dana Darurat",
+                        targetAmount = 10000000.0,
+                        currentAmount = 3200000.0,
+                        deadline = "2026-12-31",
+                        autoSaveDay = 25,
+                        monthlyAmount = 500000.0
+                    )
+                )
+            )
+        }
+
+        override suspend fun createSavingsGoal(
+            title: String,
+            targetAmount: Double,
+            deadline: String?,
+            autoSaveDay: Int,
+            monthlyAmount: Double
+        ): Result<SavingsGoal> = Result.failure(UnsupportedOperationException())
+
+        override suspend fun addSavingsProgress(goalId: String, amount: Double): Result<SavingsGoal> {
+            return Result.failure(UnsupportedOperationException())
+        }
+
+        override suspend fun deleteSavingsGoal(goalId: String): Result<Unit> {
+            return Result.failure(UnsupportedOperationException())
+        }
+    }
+
+    FinanceFreedomTheme {
+        HomeScreen(
+            transactionRepository = fakeTransactionRepository,
+            savingsRepository = fakeSavingsRepository,
+            onOpenSavings = {},
+            onOpenAdd = {}
         )
     }
 }

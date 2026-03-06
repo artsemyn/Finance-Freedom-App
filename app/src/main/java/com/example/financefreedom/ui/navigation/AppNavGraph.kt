@@ -10,13 +10,17 @@ import androidx.navigation.compose.rememberNavController
 import com.example.financefreedom.data.local.SessionManager
 import com.example.financefreedom.data.local.ThemeMode
 import com.example.financefreedom.data.repository.AuthRepository
+import com.example.financefreedom.data.repository.ReminderRepository
+import com.example.financefreedom.data.repository.SavingsRepository
 import com.example.financefreedom.data.repository.TransactionRepository
 import com.example.financefreedom.ui.add.AddScreen
 import com.example.financefreedom.ui.auth.LoginScreen
 import com.example.financefreedom.ui.history.HistoryScreen
 import com.example.financefreedom.ui.home.HomeScreen
 import com.example.financefreedom.ui.profile.ProfileScreen
+import com.example.financefreedom.ui.reminder.ReminderScreen
 import com.example.financefreedom.ui.report.ReportScreen
+import com.example.financefreedom.ui.savings.SavingsScreen
 import com.example.financefreedom.ui.screens.EntryScreen
 import com.example.financefreedom.ui.screens.RegisterScreen
 
@@ -24,6 +28,8 @@ import com.example.financefreedom.ui.screens.RegisterScreen
 fun AppNavGraph(
     authRepository: AuthRepository,
     transactionRepository: TransactionRepository,
+    savingsRepository: SavingsRepository,
+    reminderRepository: ReminderRepository,
     sessionManager: SessionManager,
     themeMode: ThemeMode,
     onThemeModeChange: (ThemeMode) -> Unit
@@ -42,6 +48,9 @@ fun AppNavGraph(
             navController.navigate(Routes.ENTRY) {
                 popUpTo(navController.graph.findStartDestination().id) { inclusive = true }
             }
+        }
+        if (isLoggedIn) {
+            reminderRepository.syncReminderSchedules()
         }
     }
 
@@ -95,7 +104,12 @@ fun AppNavGraph(
         // ── Main Tabs ────────────────────────────────────────────────────────
         composable(Routes.HOME) {
             MainTabsScaffold(navController = navController) {
-                HomeScreen(transactionRepository = transactionRepository)
+                HomeScreen(
+                    transactionRepository = transactionRepository,
+                    savingsRepository = savingsRepository,
+                    onOpenSavings = { navController.navigate(Routes.SAVINGS) },
+                    onOpenAdd = { navController.navigate(Routes.ADD) }
+                )
             }
         }
         composable(Routes.REPORT) {
@@ -103,9 +117,9 @@ fun AppNavGraph(
                 ReportScreen(transactionRepository = transactionRepository)
             }
         }
-        composable(Routes.ADD) {
+        composable(Routes.REMINDER) {
             MainTabsScaffold(navController = navController) {
-                AddScreen(transactionRepository = transactionRepository)
+                ReminderScreen(reminderRepository = reminderRepository)
             }
         }
         composable(Routes.HISTORY) {
@@ -127,6 +141,17 @@ fun AppNavGraph(
                         }
                     }
                 )
+            }
+        }
+        composable(Routes.SAVINGS) {
+            SavingsScreen(
+                savingsRepository = savingsRepository,
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(Routes.ADD) {
+            MainTabsScaffold(navController = navController) {
+                AddScreen(transactionRepository = transactionRepository)
             }
         }
     }

@@ -62,6 +62,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -70,6 +72,7 @@ import com.example.financefreedom.domain.model.MonthlySummary
 import com.example.financefreedom.domain.model.TransactionItem
 import com.example.financefreedom.ui.theme.FinanceFreedomTheme
 import com.example.financefreedom.ui.theme.financeUiColors
+import com.example.financefreedom.utils.MoneyInputFormatter
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -105,24 +108,9 @@ private val incomeCategoryApiValues = mapOf(
     "Lainnya" to "Other"
 )
 
-/** Parses amount string: supports "25000", "1.5" and Indonesian format "500.000" / "10.000.000". */
+/** Parses grouped money input such as "10.000.000" into numeric amount. */
 private fun parseAmount(amount: String): Double? {
-    if (amount.isBlank()) return null
-    val t = amount.trim()
-    val dotCount = t.count { it == '.' }
-    return when {
-        dotCount == 0 -> t.toDoubleOrNull()
-        dotCount >= 2 -> t.replace(".", "").toDoubleOrNull() // e.g. 10.000.000
-        else -> {
-            // Single dot: "500.000" = 500k (thousand sep) vs "1.5" = decimal
-            val afterDot = t.substringAfter(".")
-            if (afterDot.length == 3 && afterDot.all { it.isDigit() }) {
-                t.replace(".", "").toDoubleOrNull() // 500.000 -> 500000
-            } else {
-                t.toDoubleOrNull() // 1.5 -> 1.5
-            }
-        }
-    }
+    return MoneyInputFormatter.toDoubleOrNull(amount)
 }
 
 // ─── Main Screen ──────────────────────────────────────────────────────────────
@@ -136,7 +124,7 @@ fun AddScreen(transactionRepository: TransactionRepository) {
 
     // Form state
     var title       by remember { mutableStateOf("") }
-    var amount      by remember { mutableStateOf("") }
+    var amountField by remember { mutableStateOf(TextFieldValue("")) }
     var category    by remember { mutableStateOf("") }
     var typeIncome  by remember { mutableStateOf(false) } // false = expense
     val today       = remember { LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) }
@@ -144,7 +132,11 @@ fun AddScreen(transactionRepository: TransactionRepository) {
     val scope        = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
 
-    val isFormValid = title.isNotBlank() && amount.isNotBlank() && parseAmount(amount) != null && category.isNotBlank()
+    val isFormValid =
+        title.isNotBlank() &&
+        amountField.text.isNotBlank() &&
+        parseAmount(amountField.text) != null &&
+        category.isNotBlank()
 
     Surface(modifier = Modifier.fillMaxSize(), color = ui.background) {
         Column(
@@ -184,13 +176,18 @@ fun AddScreen(transactionRepository: TransactionRepository) {
                 FieldDivider()
 
                 // Amount
-                FormField(
+                MoneyFormField(
                     icon          = Icons.Rounded.AttachMoney,
                     label         = "Jumlah (Rp)",
-                    value         = amount,
-                    placeholder   = "0",
-                    onValueChange = { if (it.all { c -> c.isDigit() || c == '.' }) amount = it },
-                    keyboardType  = KeyboardType.Number,
+                    value         = amountField,
+                    placeholder   = "Rp 0",
+                    onValueChange = { input ->
+                        val formatted = MoneyInputFormatter.formatInput(input.text)
+                        amountField = TextFieldValue(
+                            text = formatted,
+                            selection = TextRange(formatted.length)
+                        )
+                    },
                     imeAction     = ImeAction.Next,
                     onImeAction   = { focusManager.moveFocus(FocusDirection.Down) }
                 )
@@ -247,7 +244,7 @@ fun AddScreen(transactionRepository: TransactionRepository) {
                     isLoading = true
                     focusManager.clearFocus()
                     scope.launch {
-                        val amountValue = parseAmount(amount) ?: 0.0
+                        val amountValue = parseAmount(amountField.text) ?: 0.0
                         val type = if (typeIncome) "income" else "expense"
                         // Backend only accepts "Other" for income; always send that to avoid "Invalid category" error.
                         val categoryForApi = if (typeIncome) "Other" else category
@@ -263,7 +260,7 @@ fun AddScreen(transactionRepository: TransactionRepository) {
                         result.onSuccess {
                             isSuccess = true
                             title     = ""
-                            amount    = ""
+                            amountField = TextFieldValue("")
                             category  = ""
                         }.onFailure {
                             errorMsg = it.message ?: "Gagal menambahkan transaksi."
@@ -525,6 +522,56 @@ private fun FieldDivider() {
             .height(1.dp)
             .background(ui.outline)
     )
+}
+
+@Composable
+private fun MoneyFormField(
+    icon: ImageVector,
+    label: String,
+    value: TextFieldValue,
+    placeholder: String,
+    onValueChange: (TextFieldValue) -> Unit,
+    imeAction: ImeAction = ImeAction.Done,
+    onImeAction: () -> Unit = {}
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 18.dp, vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(34.dp)
+                .clip(RoundedCornerShape(10.dp))
+                .background(AccentGreen.copy(alpha = 0.1f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(imageVector = icon, contentDescription = null, tint = AccentGreen, modifier = Modifier.size(17.dp))
+        }
+        Spacer(Modifier.width(14.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(text = label, fontSize = 10.sp, color = TextMuted, fontWeight = FontWeight.Medium, letterSpacing = 0.5.sp)
+            Spacer(Modifier.height(4.dp))
+            BasicTextField(
+                value = value,
+                onValueChange = onValueChange,
+                singleLine = true,
+                textStyle = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = TextPrimary),
+                cursorBrush = SolidColor(AccentGreen),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = imeAction),
+                keyboardActions = KeyboardActions(onAny = { onImeAction() }),
+                decorationBox = { inner ->
+                    Box {
+                        if (value.text.isEmpty()) {
+                            Text(text = placeholder, fontSize = 14.sp, color = TextMuted, fontWeight = FontWeight.Normal)
+                        }
+                        inner()
+                    }
+                }
+            )
+        }
+    }
 }
 
 // ─── Category Grid ────────────────────────────────────────────────────────────

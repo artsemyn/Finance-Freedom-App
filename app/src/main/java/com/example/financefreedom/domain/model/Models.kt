@@ -21,3 +21,25 @@ data class MonthlySummary(
     val balance: Double
 )
 
+data class SavingsGoal(
+    val id: String,
+    val title: String,
+    val targetAmount: Double,
+    val currentAmount: Double,
+    val deadline: String,
+    val autoSaveDay: Int,
+    val monthlyAmount: Double
+)
+
+data class ReminderItem(
+    val id: String,
+    val title: String,
+    val amount: Double,
+    val type: String,
+    val dueDate: String,
+    val isPaid: Boolean,
+    val repeatInterval: String?,
+    val userId: String?,
+    val createdAt: String?
+)
+

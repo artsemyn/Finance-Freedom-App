@@ -110,9 +110,10 @@ Base behavior:
 
 Primary endpoint groups to align with:
 - Auth: `/auth/register`, `/auth/login`, `/auth/me`
-- Transactions: `/transactions`, `/transactions/:id`, `/transactions/summary?month=YYYY-MM`
+- Root: `/`, `/health`
+- Transactions: `/transactions`, `/transactions/:id`, `/transactions/summary`, `/transactions/categories`, `/transactions/categories/:id`
 - Savings Goals: `/savings`, `/savings/:id/progress`, `/savings/:id`
-- Reminders: `/reminders`, `/reminders/upcoming`, `/reminders/:id/paid`, `/reminders/:id`
+- Reminders: `/reminders`, `/reminders/upcoming`, `/reminders/:id/paid`
 
 Backend feature note:
 - Backend includes monthly auto-savings via cron job (`src/jobs/autoSavings.job.js`)
@@ -251,8 +252,8 @@ Status legend:
 - [x] Phase 0: Foundation & Architecture Setup
 - [x] Phase 1: Authentication
 - [x] Phase 2: Transactions Core
-- [ ] Phase 3: Savings Goals
-- [ ] Phase 4: Reminder + Notification
+- [x] Phase 3: Savings Goals
+- [x] Phase 4: Reminder + Notification
 - [ ] Phase 5: Home Dashboard
 - [ ] Phase 6: Report & Analytics
 - [ ] Phase 7: UI & Design Polish
@@ -273,6 +274,22 @@ Format:
 If no files were modified, no entry required.
 
 ## 15. Change Log
+
+2026-03-06 | Codex | AGENTS.md, app/src/main/AndroidManifest.xml, app/src/main/java/com/example/financefreedom/MainActivity.kt, app/src/main/java/com/example/financefreedom/data/local/ReminderNotificationWorker.kt, app/src/main/java/com/example/financefreedom/data/local/ReminderScheduler.kt, app/src/main/java/com/example/financefreedom/data/remote/FinanceApiService.kt, app/src/main/java/com/example/financefreedom/domain/model/Models.kt, app/src/main/java/com/example/financefreedom/data/repository/ReminderRepository.kt, app/src/main/java/com/example/financefreedom/data/repository/ReminderRepositoryImpl.kt, app/src/main/java/com/example/financefreedom/ui/navigation/Destinations.kt, app/src/main/java/com/example/financefreedom/ui/navigation/MainTabsScaffold.kt, app/src/main/java/com/example/financefreedom/ui/navigation/AppNavGraph.kt, app/src/main/java/com/example/financefreedom/ui/home/HomeScreen.kt, app/src/main/java/com/example/financefreedom/ui/reminder/ReminderUiState.kt, app/src/main/java/com/example/financefreedom/ui/reminder/ReminderViewModel.kt, app/src/main/java/com/example/financefreedom/ui/reminder/ReminderViewModelFactory.kt, app/src/main/java/com/example/financefreedom/ui/reminder/ReminderScreen.kt | Implemented Phase 4 reminder system end-to-end: reminder CRUD + paid status, WorkManager unique scheduling with 1-day-before notification and cancel/reconcile flow, Reminder tab integration, and Home CTA relocation for Add transaction.
+
+2026-03-06 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/data/remote/FinanceApiService.kt, app/src/main/java/com/example/financefreedom/data/repository/SavingsRepository.kt, app/src/main/java/com/example/financefreedom/data/repository/SavingsRepositoryImpl.kt, app/src/main/java/com/example/financefreedom/ui/savings/SavingsViewModel.kt, app/src/main/java/com/example/financefreedom/ui/savings/SavingsScreen.kt, app/src/main/java/com/example/financefreedom/ui/home/HomeScreen.kt | Made savings deadline optional end-to-end and switched deadline input to calendar-based selection in Savings form.
+
+2026-03-06 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/ui/savings/SavingsScreen.kt | Aligned savings goal form validation with backend rules: autoSaveDay 1-28 and positive (non-zero) money amounts before POST.
+
+2026-03-06 | Codex | AGENTS.md | Updated API endpoint inventory in integration rules to include root/health and current transaction/reminder route set.
+
+2026-03-06 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/utils/MoneyInputFormatter.kt, app/src/main/java/com/example/financefreedom/ui/add/AddScreen.kt, app/src/main/java/com/example/financefreedom/ui/savings/SavingsScreen.kt | Implemented automatic thousand-group money input formatting across all money fields and fixed caret behavior by using TextFieldValue-based formatting.
+
+2026-03-06 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/ui/profile/ProfileScreen.kt | Updated logout confirmation actions to equal-width full-row buttons so "Batal" and "Keluar" fill horizontal space with matching size.
+
+2026-03-06 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/ui/profile/ProfileScreen.kt | Updated logout confirmation dialog action slots to a custom row so "Batal" and "Keluar" remain horizontally aligned.
+
+2026-03-06 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/MainActivity.kt, app/src/main/java/com/example/financefreedom/data/remote/FinanceApiService.kt, app/src/main/java/com/example/financefreedom/domain/model/Models.kt, app/src/main/java/com/example/financefreedom/data/repository/SavingsRepository.kt, app/src/main/java/com/example/financefreedom/data/repository/SavingsRepositoryImpl.kt, app/src/main/java/com/example/financefreedom/ui/navigation/Destinations.kt, app/src/main/java/com/example/financefreedom/ui/navigation/AppNavGraph.kt, app/src/main/java/com/example/financefreedom/ui/home/HomeUiState.kt, app/src/main/java/com/example/financefreedom/ui/home/HomeViewModel.kt, app/src/main/java/com/example/financefreedom/ui/home/HomeViewModelFactory.kt, app/src/main/java/com/example/financefreedom/ui/home/HomeScreen.kt, app/src/main/java/com/example/financefreedom/ui/savings/SavingsUiState.kt, app/src/main/java/com/example/financefreedom/ui/savings/SavingsViewModel.kt, app/src/main/java/com/example/financefreedom/ui/savings/SavingsViewModelFactory.kt, app/src/main/java/com/example/financefreedom/ui/savings/SavingsScreen.kt | Implemented Phase 3 savings goals end-to-end (REST wiring, repository, MVVM state), added dedicated Savings screen, and refactored Home screen to ViewModel-based transaction+savings summary.
 
 2026-03-02 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/ui/screens/Loginscreen.kt | Rebuilt the legacy login screen to match the project UI system and removed old gradient/social-login styling leftovers.
 
