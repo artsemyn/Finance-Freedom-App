@@ -255,8 +255,8 @@ Status legend:
 - [x] Phase 3: Savings Goals
 - [x] Phase 4: Reminder + Notification
 - [x] Phase 5: Home Dashboard
-- [ ] Phase 6: Report & Analytics
-- [ ] Phase 7: UI & Design Polish
+- [x] Phase 6: Report & Analytics
+- [x] Phase 7: UI & Design Polish
 - [ ] Phase 8: Security Hardening
 - [ ] Phase 9: Testing & Stabilization
 - [ ] Phase 10: Production Readiness
@@ -274,6 +274,10 @@ Format:
 If no files were modified, no entry required.
 
 ## 15. Change Log
+
+2026-03-07 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/ui/theme/Type.kt, app/src/main/java/com/example/financefreedom/ui/theme/FinanceTokens.kt, app/src/main/java/com/example/financefreedom/ui/components/FinancePrimitives.kt, app/src/main/java/com/example/financefreedom/ui/home/HomeScreen.kt, app/src/main/java/com/example/financefreedom/ui/report/ReportScreen.kt, app/src/main/java/com/example/financefreedom/ui/reminder/ReminderScreen.kt, app/src/main/java/com/example/financefreedom/ui/savings/SavingsScreen.kt, app/src/main/java/com/example/financefreedom/ui/add/AddScreen.kt, app/src/main/java/com/example/financefreedom/ui/history/HistoryScreen.kt, app/src/main/java/com/example/financefreedom/ui/profile/ProfileScreen.kt | Completed Phase 7 UI polish by introducing shared design tokens and reusable card/banner/motion primitives, refreshing typography scale, and applying consistent rounded/elevated styling plus section animations across main tab surfaces.
+
+2026-03-07 | Codex | AGENTS.md, app/build.gradle.kts, app/src/main/java/com/example/financefreedom/ui/report/ReportUiState.kt, app/src/main/java/com/example/financefreedom/ui/report/ReportViewModel.kt, app/src/main/java/com/example/financefreedom/ui/report/ReportViewModelFactory.kt, app/src/main/java/com/example/financefreedom/ui/report/ReportScreen.kt, app/src/test/java/com/example/financefreedom/ui/report/ReportViewModelTest.kt | Completed Phase 6 report analytics by enforcing Report MVVM, adding month/category/weekly/trend aggregations, Compose chart visuals, and ViewModel unit coverage.
 
 2026-03-07 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/ui/add/AddScreen.kt | Restored Add page dual-tab flow with Transaction and Reminder forms, keeping backend-driven transaction category loading and create-only Reminder tab behavior.
 

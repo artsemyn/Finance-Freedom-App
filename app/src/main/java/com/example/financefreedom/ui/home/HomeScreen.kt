@@ -49,7 +49,12 @@ import com.example.financefreedom.domain.model.ReminderItem
 import com.example.financefreedom.domain.model.SavingsGoal
 import com.example.financefreedom.domain.model.TransactionCategories
 import com.example.financefreedom.domain.model.TransactionItem
+import com.example.financefreedom.ui.components.FinanceAnimatedReveal
+import com.example.financefreedom.ui.components.FinanceCardSurface
+import com.example.financefreedom.ui.components.FinanceMessageBanner
 import com.example.financefreedom.ui.theme.FinanceFreedomTheme
+import com.example.financefreedom.ui.theme.FinanceCorners
+import com.example.financefreedom.ui.theme.FinanceSpacing
 import com.example.financefreedom.ui.theme.financeCardGradient
 import com.example.financefreedom.ui.theme.financeUiColors
 import java.text.NumberFormat
@@ -96,37 +101,46 @@ fun HomeScreen(
                 }
 
                 item {
-                    BalanceCard(
-                        netBalance = state.netBalance,
-                        totalIncome = state.totalIncome,
-                        totalExpense = state.totalExpense
-                    )
+                    FinanceAnimatedReveal(index = 1) {
+                        BalanceCard(
+                            netBalance = state.netBalance,
+                            totalIncome = state.totalIncome,
+                            totalExpense = state.totalExpense
+                        )
+                    }
                 }
 
                 item {
-                    SavingsOverviewCard(
-                        savingsGoals = state.savingsGoals,
-                        totalCurrent = state.totalSavingsCurrent,
-                        totalTarget = state.totalSavingsTarget,
-                        progress = state.overallSavingsProgress,
-                        onOpenSavings = onOpenSavings
-                    )
+                    FinanceAnimatedReveal(index = 2) {
+                        SavingsOverviewCard(
+                            savingsGoals = state.savingsGoals,
+                            totalCurrent = state.totalSavingsCurrent,
+                            totalTarget = state.totalSavingsTarget,
+                            progress = state.overallSavingsProgress,
+                            onOpenSavings = onOpenSavings
+                        )
+                    }
                 }
                 item {
-                    UpcomingRemindersCard(
-                        reminders = state.upcomingReminders,
-                        onOpenReminder = onOpenReminder
-                    )
+                    FinanceAnimatedReveal(index = 3) {
+                        UpcomingRemindersCard(
+                            reminders = state.upcomingReminders,
+                            onOpenReminder = onOpenReminder
+                        )
+                    }
                 }
                 item {
-                    QuickActionsCard(onOpenAdd = onOpenAdd)
+                    FinanceAnimatedReveal(index = 4) {
+                        QuickActionsCard(onOpenAdd = onOpenAdd)
+                    }
                 }
 
                 if (!state.errorMessage.isNullOrBlank()) {
                     item {
-                        MessageBanner(
+                        FinanceMessageBanner(
                             message = state.errorMessage.orEmpty(),
-                            isError = true
+                            isError = true,
+                            modifier = Modifier.padding(horizontal = FinanceSpacing.screenHorizontal)
                         )
                     }
                 }
@@ -151,9 +165,10 @@ fun HomeScreen(
 
                     state.transactions.isEmpty() -> {
                         item {
-                            MessageBanner(
+                            FinanceMessageBanner(
                                 message = "Belum ada transaksi. Tambahkan data lewat tombol tambah di Home.",
-                                isError = false
+                                isError = false,
+                                modifier = Modifier.padding(horizontal = FinanceSpacing.screenHorizontal)
                             )
                         }
                     }
@@ -183,14 +198,10 @@ fun HomeScreen(
 @Composable
 private fun QuickActionsCard(onOpenAdd: () -> Unit) {
     val ui = financeUiColors()
-    Box(
+    FinanceCardSurface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp)
-            .clip(RoundedCornerShape(24.dp))
-            .background(ui.surface)
-            .border(1.dp, ui.outline, RoundedCornerShape(24.dp))
-            .padding(16.dp)
+            .padding(horizontal = FinanceSpacing.screenHorizontal)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -256,15 +267,18 @@ private fun BalanceCard(
     totalExpense: Double
 ) {
     val ui = financeUiColors()
-    Box(
+    FinanceCardSurface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp)
-            .clip(RoundedCornerShape(24.dp))
-            .background(financeCardGradient())
-            .border(1.dp, ui.outline, RoundedCornerShape(24.dp))
-            .padding(22.dp)
+            .padding(horizontal = FinanceSpacing.screenHorizontal),
+        cornerRadius = FinanceCorners.cardLarge
     ) {
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(FinanceCorners.cardLarge))
+                .background(financeCardGradient())
+                .padding(6.dp)
+        ) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text(text = "Saldo Bersih Bulan Ini", fontSize = 12.sp, color = ui.mutedText)
             Text(
@@ -286,6 +300,7 @@ private fun BalanceCard(
                 )
             }
         }
+        }
     }
 }
 
@@ -298,15 +313,12 @@ private fun SavingsOverviewCard(
     onOpenSavings: () -> Unit
 ) {
     val ui = financeUiColors()
-    Box(
+    FinanceCardSurface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp)
-            .clip(RoundedCornerShape(24.dp))
-            .background(ui.surface)
-            .border(1.dp, ui.outline, RoundedCornerShape(24.dp))
-            .clickable(onClick = onOpenSavings)
-            .padding(18.dp)
+            .padding(horizontal = FinanceSpacing.screenHorizontal)
+            .clickable(onClick = onOpenSavings),
+        cornerRadius = FinanceCorners.cardLarge
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(
@@ -357,14 +369,14 @@ private fun SavingsOverviewCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(10.dp)
-                    .clip(RoundedCornerShape(50))
+                    .clip(RoundedCornerShape(FinanceCorners.pill))
                     .background(ui.surfaceAlt)
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth(progress.coerceIn(0f, 1f))
                         .height(10.dp)
-                        .clip(RoundedCornerShape(50))
+                        .clip(RoundedCornerShape(FinanceCorners.pill))
                         .background(ui.positive)
                 )
             }
@@ -384,15 +396,12 @@ private fun UpcomingRemindersCard(
     onOpenReminder: () -> Unit
 ) {
     val ui = financeUiColors()
-    Box(
+    FinanceCardSurface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp)
-            .clip(RoundedCornerShape(24.dp))
-            .background(ui.surface)
-            .border(1.dp, ui.outline, RoundedCornerShape(24.dp))
-            .clickable(onClick = onOpenReminder)
-            .padding(18.dp)
+            .padding(horizontal = FinanceSpacing.screenHorizontal)
+            .clickable(onClick = onOpenReminder),
+        cornerRadius = FinanceCorners.cardLarge
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Row(
@@ -506,26 +515,6 @@ private fun TransactionRow(transaction: TransactionItem) {
             color = if (income) ui.positive else ui.negative,
             fontWeight = FontWeight.Bold,
             fontSize = 13.sp
-        )
-    }
-}
-
-@Composable
-private fun MessageBanner(message: String, isError: Boolean) {
-    val ui = financeUiColors()
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(if (isError) ui.negative.copy(alpha = 0.14f) else ui.surface)
-            .border(1.dp, ui.outline, RoundedCornerShape(16.dp))
-            .padding(horizontal = 14.dp, vertical = 12.dp)
-    ) {
-        Text(
-            text = message,
-            color = if (isError) ui.negative else ui.secondaryText,
-            fontSize = 12.sp
         )
     }
 }

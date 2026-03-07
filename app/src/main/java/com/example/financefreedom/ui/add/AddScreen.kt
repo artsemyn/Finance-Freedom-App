@@ -82,7 +82,10 @@ import com.example.financefreedom.domain.model.MonthlySummary
 import com.example.financefreedom.domain.model.ReminderItem
 import com.example.financefreedom.domain.model.TransactionCategories
 import com.example.financefreedom.domain.model.TransactionItem
+import com.example.financefreedom.ui.components.FinanceCardSurface
+import com.example.financefreedom.ui.theme.FinanceCorners
 import com.example.financefreedom.ui.theme.FinanceFreedomTheme
+import com.example.financefreedom.ui.theme.FinanceSpacing
 import com.example.financefreedom.ui.theme.financeUiColors
 import com.example.financefreedom.utils.MoneyInputFormatter
 import kotlinx.coroutines.launch
@@ -621,20 +624,13 @@ private fun TypeTab(
 
 @Composable
 private fun FormCard(content: @Composable () -> Unit) {
-    val ui = financeUiColors()
-
-    Box(
+    FinanceCardSurface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp)
-            .clip(RoundedCornerShape(20.dp))
-            .background(ui.surface)
-            .border(1.dp, ui.outline, RoundedCornerShape(20.dp))
+            .padding(horizontal = FinanceSpacing.screenHorizontal),
+        cornerRadius = FinanceCorners.cardMedium
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) { content() }
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) { content() }
     }
 }
 

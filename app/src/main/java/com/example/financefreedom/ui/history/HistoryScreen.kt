@@ -56,6 +56,9 @@ import com.example.financefreedom.data.repository.TransactionRepository
 import com.example.financefreedom.domain.model.MonthlySummary
 import com.example.financefreedom.domain.model.TransactionCategories
 import com.example.financefreedom.domain.model.TransactionItem
+import com.example.financefreedom.ui.components.FinanceCardSurface
+import com.example.financefreedom.ui.theme.FinanceCorners
+import com.example.financefreedom.ui.theme.FinanceSpacing
 import com.example.financefreedom.ui.theme.FinanceFreedomTheme
 import com.example.financefreedom.ui.theme.financeUiColors
 import java.text.NumberFormat
@@ -280,27 +283,28 @@ private fun MiniStatCard(
 ) {
     val ui = financeUiColors()
 
-    Row(
+    FinanceCardSurface(
         modifier = modifier
-            .clip(RoundedCornerShape(16.dp))
-            .background(ui.surface)
-            .border(1.dp, ui.outline, RoundedCornerShape(16.dp))
-            .padding(14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
+            .fillMaxWidth(),
+        cornerRadius = FinanceCorners.chip
     ) {
-        Box(
-            modifier = Modifier
-                .size(32.dp)
-                .clip(RoundedCornerShape(9.dp))
-                .background(color.copy(alpha = 0.13f)),
-            contentAlignment = Alignment.Center
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            Icon(imageVector = icon, contentDescription = null, tint = color, modifier = Modifier.size(16.dp))
-        }
-        Column {
-            Text(text = label, fontSize = 10.sp, color = ui.mutedText, fontWeight = FontWeight.Medium, letterSpacing = 0.3.sp)
-            Text(text = formatRupiah(amount), fontSize = 13.sp, fontWeight = FontWeight.Bold, color = color)
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(RoundedCornerShape(9.dp))
+                    .background(color.copy(alpha = 0.13f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(imageVector = icon, contentDescription = null, tint = color, modifier = Modifier.size(16.dp))
+            }
+            Column {
+                Text(text = label, fontSize = 10.sp, color = ui.mutedText, fontWeight = FontWeight.Medium, letterSpacing = 0.3.sp)
+                Text(text = formatRupiah(amount), fontSize = 13.sp, fontWeight = FontWeight.Bold, color = color)
+            }
         }
     }
 }
