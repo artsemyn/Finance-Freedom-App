@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.financefreedom.data.repository.TransactionRepository
 import com.example.financefreedom.domain.model.MonthlySummary
+import com.example.financefreedom.domain.model.TransactionCategories
 import com.example.financefreedom.domain.model.TransactionItem
 import com.example.financefreedom.ui.theme.FinanceFreedomTheme
 import com.example.financefreedom.ui.theme.financeUiColors
@@ -646,6 +647,10 @@ private fun ReportScreenPreview() {
             transactionRepository = object : TransactionRepository {
                 override suspend fun getTransactions(): Result<List<TransactionItem>> =
                     Result.success(emptyList())
+
+                override suspend fun getTransactionCategories(forceRefresh: Boolean): Result<TransactionCategories> {
+                    return Result.success(TransactionCategories(income = emptyList(), expense = emptyList()))
+                }
 
                 override suspend fun createTransaction(
                     title: String,

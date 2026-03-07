@@ -254,7 +254,7 @@ Status legend:
 - [x] Phase 2: Transactions Core
 - [x] Phase 3: Savings Goals
 - [x] Phase 4: Reminder + Notification
-- [ ] Phase 5: Home Dashboard
+- [x] Phase 5: Home Dashboard
 - [ ] Phase 6: Report & Analytics
 - [ ] Phase 7: UI & Design Polish
 - [ ] Phase 8: Security Hardening
@@ -274,6 +274,18 @@ Format:
 If no files were modified, no entry required.
 
 ## 15. Change Log
+
+2026-03-07 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/ui/add/AddScreen.kt | Restored Add page dual-tab flow with Transaction and Reminder forms, keeping backend-driven transaction category loading and create-only Reminder tab behavior.
+
+2026-03-07 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/ui/reminder/ReminderScreen.kt, app/src/main/java/com/example/financefreedom/ui/add/AddScreen.kt | Updated Reminder page to list-only by removing the add-reminder form section while keeping pull-to-refresh and reminder actions.
+
+2026-03-07 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/MainActivity.kt, app/src/main/java/com/example/financefreedom/data/local/TransactionCategoryCacheManager.kt, app/src/main/java/com/example/financefreedom/data/remote/FinanceApiService.kt, app/src/main/java/com/example/financefreedom/data/repository/AuthRepositoryImpl.kt, app/src/main/java/com/example/financefreedom/data/repository/TransactionRepository.kt, app/src/main/java/com/example/financefreedom/data/repository/TransactionRepositoryImpl.kt, app/src/main/java/com/example/financefreedom/domain/model/Models.kt, app/src/main/java/com/example/financefreedom/ui/add/AddScreen.kt, app/src/main/java/com/example/financefreedom/ui/history/HistoryScreen.kt, app/src/main/java/com/example/financefreedom/ui/report/ReportScreen.kt | Fetched transaction categories from backend, cached them locally for session reuse, used cached fallback when offline, and cleared category cache on logout.
+
+2026-03-07 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/ui/navigation/Destinations.kt, app/src/main/java/com/example/financefreedom/ui/navigation/AppNavGraph.kt, app/src/main/java/com/example/financefreedom/ui/home/HomeScreen.kt, app/src/main/java/com/example/financefreedom/ui/add/AddScreen.kt | Moved Reminder access from bottom tab to Home header action, restored Add as center bottom tab, and split Add page into Transaction/Reminder tabs with create-only Reminder form.
+
+2026-03-07 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/ui/home/HomeScreen.kt, app/src/main/java/com/example/financefreedom/ui/reminder/ReminderScreen.kt | Replaced header refresh buttons with swipe-down pull-to-refresh interactions on Home and Reminder screens.
+
+2026-03-07 | Codex | AGENTS.md, gradle/libs.versions.toml, app/build.gradle.kts, app/src/main/java/com/example/financefreedom/ui/navigation/AppNavGraph.kt, app/src/main/java/com/example/financefreedom/ui/home/HomeUiState.kt, app/src/main/java/com/example/financefreedom/ui/home/HomeViewModel.kt, app/src/main/java/com/example/financefreedom/ui/home/HomeViewModelFactory.kt, app/src/main/java/com/example/financefreedom/ui/home/HomeScreen.kt, app/src/test/java/com/example/financefreedom/ui/home/HomeViewModelTest.kt | Completed Phase 5 Home Dashboard by wiring current-month summary, top-3 upcoming reminders, reminder navigation CTA, and Home aggregator unit tests.
 
 2026-03-06 | Codex | AGENTS.md, app/src/main/AndroidManifest.xml, app/src/main/java/com/example/financefreedom/MainActivity.kt, app/src/main/java/com/example/financefreedom/data/local/ReminderNotificationWorker.kt, app/src/main/java/com/example/financefreedom/data/local/ReminderScheduler.kt, app/src/main/java/com/example/financefreedom/data/remote/FinanceApiService.kt, app/src/main/java/com/example/financefreedom/domain/model/Models.kt, app/src/main/java/com/example/financefreedom/data/repository/ReminderRepository.kt, app/src/main/java/com/example/financefreedom/data/repository/ReminderRepositoryImpl.kt, app/src/main/java/com/example/financefreedom/ui/navigation/Destinations.kt, app/src/main/java/com/example/financefreedom/ui/navigation/MainTabsScaffold.kt, app/src/main/java/com/example/financefreedom/ui/navigation/AppNavGraph.kt, app/src/main/java/com/example/financefreedom/ui/home/HomeScreen.kt, app/src/main/java/com/example/financefreedom/ui/reminder/ReminderUiState.kt, app/src/main/java/com/example/financefreedom/ui/reminder/ReminderViewModel.kt, app/src/main/java/com/example/financefreedom/ui/reminder/ReminderViewModelFactory.kt, app/src/main/java/com/example/financefreedom/ui/reminder/ReminderScreen.kt | Implemented Phase 4 reminder system end-to-end: reminder CRUD + paid status, WorkManager unique scheduling with 1-day-before notification and cancel/reconcile flow, Reminder tab integration, and Home CTA relocation for Add transaction.
 

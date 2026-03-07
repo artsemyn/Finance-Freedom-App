@@ -21,6 +21,11 @@ data class MonthlySummary(
     val balance: Double
 )
 
+data class TransactionCategories(
+    val income: List<String>,
+    val expense: List<String>
+)
+
 data class SavingsGoal(
     val id: String,
     val title: String,

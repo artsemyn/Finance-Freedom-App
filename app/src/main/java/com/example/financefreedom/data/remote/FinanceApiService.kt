@@ -1,5 +1,6 @@
 package com.example.financefreedom.data.remote
 
+import com.google.gson.JsonElement
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -20,6 +21,9 @@ interface FinanceApiService {
 
     @GET("transactions")
     suspend fun getTransactions(): List<TransactionDto>
+
+    @GET("transactions/categories")
+    suspend fun getTransactionCategories(): JsonElement
 
     @POST("transactions")
     suspend fun createTransaction(@Body request: CreateTransactionRequest): TransactionDto

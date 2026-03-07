@@ -1,9 +1,12 @@
 package com.example.financefreedom.data.repository
 
+import com.example.financefreedom.data.local.TransactionCategoryCacheManager
 import com.example.financefreedom.data.remote.CreateTransactionRequest
 import com.example.financefreedom.data.remote.FinanceApiService
 import com.example.financefreedom.domain.model.MonthlySummary
+import com.example.financefreedom.domain.model.TransactionCategories
 import com.example.financefreedom.domain.model.TransactionItem
+import com.google.gson.JsonElement
 import retrofit2.HttpException
 import java.io.IOException
 import java.net.UnknownHostException
@@ -11,7 +14,8 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 class TransactionRepositoryImpl(
-    private val apiService: FinanceApiService
+    private val apiService: FinanceApiService,
+    private val categoryCacheManager: TransactionCategoryCacheManager
 ) : TransactionRepository {
 
     override suspend fun getTransactions(): Result<List<TransactionItem>> {
@@ -60,6 +64,24 @@ class TransactionRepositoryImpl(
         }.mapError()
     }
 
+    override suspend fun getTransactionCategories(forceRefresh: Boolean): Result<TransactionCategories> {
+        val cached = categoryCacheManager.get()
+        if (!forceRefresh && cached != null) {
+            return Result.success(cached)
+        }
+
+        return runCatching {
+            val parsed = parseTransactionCategories(apiService.getTransactionCategories())
+            if (parsed.income.isEmpty() && parsed.expense.isEmpty()) {
+                throw IllegalStateException("Kategori transaksi kosong dari server.")
+            }
+            categoryCacheManager.save(parsed)
+            parsed
+        }.recoverCatching {
+            cached ?: throw it
+        }.mapError()
+    }
+
     override suspend fun getMonthlySummary(month: String): Result<MonthlySummary> {
         return runCatching {
             val summary = apiService.getSummary(month)
@@ -75,6 +97,91 @@ class TransactionRepositoryImpl(
     }
 
     fun currentMonth(): String = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"))
+
+    private fun parseTransactionCategories(payload: JsonElement): TransactionCategories {
+        val income = linkedSetOf<String>()
+        val expense = linkedSetOf<String>()
+
+        if (payload.isJsonArray) {
+            payload.asJsonArray.forEach { item ->
+                if (item.isJsonPrimitive) {
+                    item.asString
+                        .trim()
+                        .takeIf { it.isNotBlank() }
+                        ?.let(expense::add)
+                } else if (item.isJsonObject) {
+                    val obj = item.asJsonObject
+                    val name = obj.getString("name")
+                        ?: obj.getString("category")
+                        ?: obj.getString("label")
+                    val type = obj.getString("type")
+                        ?.lowercase()
+                        ?.trim()
+                    name?.takeIf { it.isNotBlank() }?.let {
+                        when (type) {
+                            "income" -> income.add(it)
+                            "expense" -> expense.add(it)
+                            else -> expense.add(it)
+                        }
+                    }
+                }
+            }
+        } else if (payload.isJsonObject) {
+            val root = payload.asJsonObject
+            parseTypedArray(root.get("income"), income)
+            parseTypedArray(root.get("expense"), expense)
+            parseArrayObjects(root.get("categories"), income, expense)
+        }
+
+        return TransactionCategories(
+            income = income.toList(),
+            expense = expense.toList()
+        )
+    }
+
+    private fun parseTypedArray(source: JsonElement?, target: MutableSet<String>) {
+        if (source == null || !source.isJsonArray) return
+        source.asJsonArray.forEach { item ->
+            when {
+                item.isJsonPrimitive -> {
+                    item.asString.trim().takeIf { it.isNotBlank() }?.let(target::add)
+                }
+                item.isJsonObject -> {
+                    item.asJsonObject.getString("name")
+                        ?.takeIf { it.isNotBlank() }
+                        ?.let(target::add)
+                }
+            }
+        }
+    }
+
+    private fun parseArrayObjects(
+        source: JsonElement?,
+        income: MutableSet<String>,
+        expense: MutableSet<String>
+    ) {
+        if (source == null || !source.isJsonArray) return
+        source.asJsonArray.forEach { item ->
+            if (!item.isJsonObject) return@forEach
+            val obj = item.asJsonObject
+            val name = obj.getString("name")
+                ?: obj.getString("category")
+                ?: obj.getString("label")
+            val type = obj.getString("type")?.lowercase()?.trim()
+            name?.takeIf { it.isNotBlank() }?.let {
+                when (type) {
+                    "income" -> income.add(it)
+                    else -> expense.add(it)
+                }
+            }
+        }
+    }
+
+    private fun com.google.gson.JsonObject.getString(key: String): String? {
+        val value = get(key) ?: return null
+        if (!value.isJsonPrimitive) return null
+        return value.asString?.trim()
+    }
 
     private fun <T> Result<T>.mapError(): Result<T> {
         val throwable = exceptionOrNull() ?: return this

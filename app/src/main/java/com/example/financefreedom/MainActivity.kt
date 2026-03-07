@@ -15,6 +15,7 @@ import com.example.financefreedom.data.local.SessionManager
 import com.example.financefreedom.data.local.ThemeMode
 import com.example.financefreedom.data.local.ThemeModeManager
 import com.example.financefreedom.data.local.TokenManager
+import com.example.financefreedom.data.local.TransactionCategoryCacheManager
 import com.example.financefreedom.data.remote.ApiClient
 import com.example.financefreedom.data.repository.AuthRepositoryImpl
 import com.example.financefreedom.data.repository.ReminderRepositoryImpl
@@ -29,6 +30,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val tokenManager = remember { TokenManager(applicationContext) }
+            val transactionCategoryCacheManager = remember { TransactionCategoryCacheManager(applicationContext) }
             val sessionManager = remember {
                 SessionManager().apply {
                     updateToken(tokenManager.getToken())
@@ -50,11 +52,15 @@ class MainActivity : ComponentActivity() {
                     AuthRepositoryImpl(
                         apiService = apiService,
                         tokenManager = tokenManager,
-                        sessionManager = sessionManager
+                        sessionManager = sessionManager,
+                        transactionCategoryCacheManager = transactionCategoryCacheManager
                     )
                 }
                 val transactionRepository = remember {
-                    TransactionRepositoryImpl(apiService = apiService)
+                    TransactionRepositoryImpl(
+                        apiService = apiService,
+                        categoryCacheManager = transactionCategoryCacheManager
+                    )
                 }
                 val savingsRepository = remember {
                     SavingsRepositoryImpl(apiService = apiService)

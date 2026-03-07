@@ -1,6 +1,7 @@
 package com.example.financefreedom.ui.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AddCircle
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Notifications
@@ -32,7 +33,7 @@ object Routes {
 val bottomTabs = listOf(
     BottomTab(route = Routes.HOME,    title = "Home",    icon = Icons.Rounded.Home),
     BottomTab(route = Routes.REPORT,  title = "Report",  icon = Icons.Rounded.PieChart),
-    BottomTab(route = Routes.REMINDER, title = "Reminder", icon = Icons.Rounded.Notifications),
+    BottomTab(route = Routes.ADD, title = "Add", icon = Icons.Rounded.AddCircle),
     BottomTab(route = Routes.HISTORY, title = "History", icon = Icons.Rounded.History),
     BottomTab(route = Routes.PROFILE, title = "Profile", icon = Icons.Rounded.Person),
 )

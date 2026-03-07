@@ -107,8 +107,10 @@ fun AppNavGraph(
                 HomeScreen(
                     transactionRepository = transactionRepository,
                     savingsRepository = savingsRepository,
+                    reminderRepository = reminderRepository,
                     onOpenSavings = { navController.navigate(Routes.SAVINGS) },
-                    onOpenAdd = { navController.navigate(Routes.ADD) }
+                    onOpenAdd = { navController.navigate(Routes.ADD) },
+                    onOpenReminder = { navController.navigate(Routes.REMINDER) }
                 )
             }
         }
@@ -151,7 +153,10 @@ fun AppNavGraph(
         }
         composable(Routes.ADD) {
             MainTabsScaffold(navController = navController) {
-                AddScreen(transactionRepository = transactionRepository)
+                AddScreen(
+                    transactionRepository = transactionRepository,
+                    reminderRepository = reminderRepository
+                )
             }
         }
     }

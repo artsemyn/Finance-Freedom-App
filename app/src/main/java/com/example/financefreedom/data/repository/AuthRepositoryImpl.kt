@@ -2,6 +2,7 @@ package com.example.financefreedom.data.repository
 
 import com.example.financefreedom.data.local.SessionManager
 import com.example.financefreedom.data.local.TokenManager
+import com.example.financefreedom.data.local.TransactionCategoryCacheManager
 import com.example.financefreedom.data.remote.AuthRequest
 import com.example.financefreedom.data.remote.FinanceApiService
 import com.example.financefreedom.domain.model.UserProfile
@@ -12,7 +13,8 @@ import java.net.UnknownHostException
 class AuthRepositoryImpl(
     private val apiService: FinanceApiService,
     private val tokenManager: TokenManager,
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val transactionCategoryCacheManager: TransactionCategoryCacheManager
 ) : AuthRepository {
 
     override suspend fun register(email: String, password: String): Result<UserProfile> {
@@ -63,6 +65,7 @@ class AuthRepositoryImpl(
 
     override fun logout() {
         tokenManager.clearToken()
+        transactionCategoryCacheManager.clear()
         sessionManager.clear()
     }
 

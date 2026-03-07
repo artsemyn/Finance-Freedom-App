@@ -20,13 +20,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
-import androidx.compose.material.icons.automirrored.rounded.TrendingUp
-import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Savings
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,10 +41,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.financefreedom.data.repository.ReminderRepository
 import com.example.financefreedom.data.repository.SavingsRepository
 import com.example.financefreedom.data.repository.TransactionRepository
 import com.example.financefreedom.domain.model.MonthlySummary
+import com.example.financefreedom.domain.model.ReminderItem
 import com.example.financefreedom.domain.model.SavingsGoal
+import com.example.financefreedom.domain.model.TransactionCategories
 import com.example.financefreedom.domain.model.TransactionItem
 import com.example.financefreedom.ui.theme.FinanceFreedomTheme
 import com.example.financefreedom.ui.theme.financeCardGradient
@@ -51,18 +55,22 @@ import com.example.financefreedom.ui.theme.financeUiColors
 import java.text.NumberFormat
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     transactionRepository: TransactionRepository,
     savingsRepository: SavingsRepository,
+    reminderRepository: ReminderRepository,
     onOpenSavings: () -> Unit,
-    onOpenAdd: () -> Unit
+    onOpenAdd: () -> Unit,
+    onOpenReminder: () -> Unit
 ) {
     val ui = financeUiColors()
     val viewModel: HomeViewModel = viewModel(
         factory = HomeViewModelFactory(
             transactionRepository = transactionRepository,
-            savingsRepository = savingsRepository
+            savingsRepository = savingsRepository,
+            reminderRepository = reminderRepository
         )
     )
     val state by viewModel.uiState.collectAsState()
@@ -71,93 +79,103 @@ fun HomeScreen(
         modifier = Modifier.fillMaxSize(),
         color = ui.background
     ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .statusBarsPadding(),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+        PullToRefreshBox(
+            isRefreshing = state.isRefreshing,
+            onRefresh = { viewModel.refresh() },
+            state = rememberPullToRefreshState(),
+            modifier = Modifier.fillMaxSize()
         ) {
-            item {
-                Header(
-                    isRefreshing = state.isRefreshing,
-                    onRefresh = { viewModel.refresh() }
-                )
-            }
-
-            item {
-                BalanceCard(
-                    netBalance = state.netBalance,
-                    totalIncome = state.totalIncome,
-                    totalExpense = state.totalExpense
-                )
-            }
-
-            item {
-                SavingsOverviewCard(
-                    savingsGoals = state.savingsGoals,
-                    totalCurrent = state.totalSavingsCurrent,
-                    totalTarget = state.totalSavingsTarget,
-                    progress = state.overallSavingsProgress,
-                    onOpenSavings = onOpenSavings
-                )
-            }
-            item {
-                QuickActionsCard(onOpenAdd = onOpenAdd)
-            }
-
-            if (!state.errorMessage.isNullOrBlank()) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .statusBarsPadding(),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
                 item {
-                    MessageBanner(
-                        message = state.errorMessage.orEmpty(),
-                        isError = true
+                    Header(onOpenReminder = onOpenReminder)
+                }
+
+                item {
+                    BalanceCard(
+                        netBalance = state.netBalance,
+                        totalIncome = state.totalIncome,
+                        totalExpense = state.totalExpense
                     )
                 }
-            }
 
-            when {
-                state.isLoading -> {
+                item {
+                    SavingsOverviewCard(
+                        savingsGoals = state.savingsGoals,
+                        totalCurrent = state.totalSavingsCurrent,
+                        totalTarget = state.totalSavingsTarget,
+                        progress = state.overallSavingsProgress,
+                        onOpenSavings = onOpenSavings
+                    )
+                }
+                item {
+                    UpcomingRemindersCard(
+                        reminders = state.upcomingReminders,
+                        onOpenReminder = onOpenReminder
+                    )
+                }
+                item {
+                    QuickActionsCard(onOpenAdd = onOpenAdd)
+                }
+
+                if (!state.errorMessage.isNullOrBlank()) {
                     item {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 24.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(
-                                color = ui.positive,
-                                modifier = Modifier.size(32.dp),
-                                strokeWidth = 2.dp
+                        MessageBanner(
+                            message = state.errorMessage.orEmpty(),
+                            isError = true
+                        )
+                    }
+                }
+
+                when {
+                    state.isLoading -> {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 24.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    color = ui.positive,
+                                    modifier = Modifier.size(32.dp),
+                                    strokeWidth = 2.dp
+                                )
+                            }
+                        }
+                    }
+
+                    state.transactions.isEmpty() -> {
+                        item {
+                            MessageBanner(
+                                message = "Belum ada transaksi. Tambahkan data lewat tombol tambah di Home.",
+                                isError = false
                             )
+                        }
+                    }
+
+                    else -> {
+                        item {
+                            Text(
+                                text = "Transaksi Terbaru",
+                                modifier = Modifier.padding(horizontal = 20.dp),
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = ui.secondaryText
+                            )
+                        }
+                        items(state.transactions.take(6)) { transaction ->
+                            TransactionRow(transaction = transaction)
                         }
                     }
                 }
 
-                state.transactions.isEmpty() -> {
-                    item {
-                        MessageBanner(
-                            message = "Belum ada transaksi. Tambahkan data lewat tombol tambah di Home.",
-                            isError = false
-                        )
-                    }
-                }
-
-                else -> {
-                    item {
-                        Text(
-                            text = "Transaksi Terbaru",
-                            modifier = Modifier.padding(horizontal = 20.dp),
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = ui.secondaryText
-                        )
-                    }
-                    items(state.transactions.take(6)) { transaction ->
-                        TransactionRow(transaction = transaction)
-                    }
-                }
+                item { Spacer(modifier = Modifier.height(20.dp)) }
             }
-
-            item { Spacer(modifier = Modifier.height(20.dp)) }
         }
     }
 }
@@ -191,10 +209,7 @@ private fun QuickActionsCard(onOpenAdd: () -> Unit) {
 }
 
 @Composable
-private fun Header(
-    isRefreshing: Boolean,
-    onRefresh: () -> Unit
-) {
+private fun Header(onOpenReminder: () -> Unit) {
     val ui = financeUiColors()
     Row(
         modifier = Modifier
@@ -221,16 +236,15 @@ private fun Header(
                 .size(44.dp)
                 .clip(CircleShape)
                 .background(ui.surface)
-                .border(1.dp, ui.outline, CircleShape),
+                .border(1.dp, ui.outline, CircleShape)
+                .clickable(onClick = onOpenReminder),
             contentAlignment = Alignment.Center
         ) {
-            IconButton(onClick = onRefresh, enabled = !isRefreshing) {
-                Icon(
-                    imageVector = if (isRefreshing) Icons.AutoMirrored.Rounded.TrendingUp else Icons.Rounded.Refresh,
-                    contentDescription = "Refresh",
-                    tint = if (isRefreshing) ui.mutedText else ui.positive
-                )
-            }
+            Icon(
+                imageVector = Icons.Rounded.Notifications,
+                contentDescription = "Open reminders",
+                tint = ui.positive
+            )
         }
     }
 }
@@ -252,7 +266,7 @@ private fun BalanceCard(
             .padding(22.dp)
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(text = "Saldo Bersih", fontSize = 12.sp, color = ui.mutedText)
+            Text(text = "Saldo Bersih Bulan Ini", fontSize = 12.sp, color = ui.mutedText)
             Text(
                 text = formatRupiah(netBalance),
                 fontSize = 30.sp,
@@ -261,12 +275,12 @@ private fun BalanceCard(
             )
             Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 Text(
-                    text = "Masuk: ${formatRupiah(totalIncome)}",
+                    text = "Masuk Bulan Ini: ${formatRupiah(totalIncome)}",
                     fontSize = 12.sp,
                     color = ui.positive
                 )
                 Text(
-                    text = "Keluar: ${formatRupiah(totalExpense)}",
+                    text = "Keluar Bulan Ini: ${formatRupiah(totalExpense)}",
                     fontSize = 12.sp,
                     color = ui.negative
                 )
@@ -361,6 +375,100 @@ private fun SavingsOverviewCard(
                 color = ui.mutedText
             )
         }
+    }
+}
+
+@Composable
+private fun UpcomingRemindersCard(
+    reminders: List<ReminderItem>,
+    onOpenReminder: () -> Unit
+) {
+    val ui = financeUiColors()
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+            .clip(RoundedCornerShape(24.dp))
+            .background(ui.surface)
+            .border(1.dp, ui.outline, RoundedCornerShape(24.dp))
+            .clickable(onClick = onOpenReminder)
+            .padding(18.dp)
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Notifications,
+                        contentDescription = null,
+                        tint = ui.accent
+                    )
+                    Text(
+                        text = "Upcoming Reminders",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = ui.primaryText
+                    )
+                }
+                Icon(
+                    imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
+                    contentDescription = "Open reminders",
+                    tint = ui.mutedText
+                )
+            }
+
+            if (reminders.isEmpty()) {
+                Text(
+                    text = "Tidak ada reminder mendatang.",
+                    fontSize = 12.sp,
+                    color = ui.secondaryText
+                )
+            } else {
+                reminders.take(3).forEach { reminder ->
+                    ReminderRow(reminder = reminder)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ReminderRow(reminder: ReminderItem) {
+    val ui = financeUiColors()
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(14.dp))
+            .background(ui.surfaceAlt)
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = reminder.title.ifBlank { "Tanpa judul" },
+                fontWeight = FontWeight.Medium,
+                color = ui.primaryText,
+                fontSize = 13.sp
+            )
+            Text(
+                text = "Jatuh tempo: ${reminder.dueDate.take(10)}",
+                fontSize = 12.sp,
+                color = ui.secondaryText
+            )
+        }
+        Text(
+            text = formatRupiah(reminder.amount),
+            fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = ui.accent
+        )
     }
 }
 
@@ -465,6 +573,15 @@ private fun HomeScreenPreview() {
             note: String
         ): Result<TransactionItem> = Result.failure(UnsupportedOperationException())
 
+        override suspend fun getTransactionCategories(forceRefresh: Boolean): Result<TransactionCategories> {
+            return Result.success(
+                TransactionCategories(
+                    income = listOf("Gaji"),
+                    expense = listOf("Makanan")
+                )
+            )
+        }
+
         override suspend fun getMonthlySummary(month: String): Result<MonthlySummary> {
             return Result.success(MonthlySummary(0.0, 0.0, 0.0))
         }
@@ -503,13 +620,63 @@ private fun HomeScreenPreview() {
             return Result.failure(UnsupportedOperationException())
         }
     }
+    val fakeReminderRepository = object : ReminderRepository {
+        override suspend fun getReminders(): Result<List<ReminderItem>> = Result.success(emptyList())
+
+        override suspend fun getUpcomingReminders(): Result<List<ReminderItem>> {
+            return Result.success(
+                listOf(
+                    ReminderItem(
+                        id = "rm1",
+                        title = "Bayar listrik",
+                        amount = 350000.0,
+                        type = "bill",
+                        dueDate = "2026-03-10",
+                        isPaid = false,
+                        repeatInterval = null,
+                        userId = null,
+                        createdAt = null
+                    ),
+                    ReminderItem(
+                        id = "rm2",
+                        title = "Cicilan motor",
+                        amount = 750000.0,
+                        type = "installment",
+                        dueDate = "2026-03-12",
+                        isPaid = false,
+                        repeatInterval = null,
+                        userId = null,
+                        createdAt = null
+                    )
+                )
+            )
+        }
+
+        override suspend fun createReminder(
+            title: String,
+            amount: Double,
+            type: String,
+            dueDate: String,
+            repeatInterval: String?
+        ): Result<ReminderItem> = Result.failure(UnsupportedOperationException())
+
+        override suspend fun markReminderPaid(reminderId: String): Result<ReminderItem> =
+            Result.failure(UnsupportedOperationException())
+
+        override suspend fun deleteReminder(reminderId: String): Result<Unit> =
+            Result.failure(UnsupportedOperationException())
+
+        override suspend fun syncReminderSchedules(): Result<Unit> = Result.success(Unit)
+    }
 
     FinanceFreedomTheme {
         HomeScreen(
             transactionRepository = fakeTransactionRepository,
             savingsRepository = fakeSavingsRepository,
+            reminderRepository = fakeReminderRepository,
             onOpenSavings = {},
-            onOpenAdd = {}
+            onOpenAdd = {},
+            onOpenReminder = {}
         )
     }
 }
