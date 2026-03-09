@@ -14,8 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.Image
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AccountBalanceWallet
 import androidx.compose.material.icons.rounded.Payments
 import androidx.compose.material.icons.rounded.Savings
 import androidx.compose.material.icons.rounded.Schedule
@@ -29,10 +29,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.financefreedom.R
 import com.example.financefreedom.ui.theme.FinanceFreedomTheme
 import com.example.financefreedom.ui.theme.financeUiColors
 
@@ -61,13 +64,14 @@ fun EntryScreen(
                 ) {
                     Box(
                         modifier = Modifier
-                            .background(ui.accent, RoundedCornerShape(18.dp))
                             .padding(14.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Rounded.AccountBalanceWallet,
-                            contentDescription = null,
-                            tint = ui.onAccent
+                        Image(
+                            painter = painterResource(id = R.drawable.app_icon),
+                            contentDescription = "Finance Freedom app icon",
+                            modifier = Modifier
+                                .scale(1.3F)
+                                .width(24.dp)
                         )
                     }
 
@@ -81,7 +85,7 @@ fun EntryScreen(
                         Text(
                             text = "Kelola uang dengan rapi dan aman",
                             style = MaterialTheme.typography.bodySmall,
-                            color = ui.secondaryText
+                            color = ui.secondaryTextReadable
                         )
                     }
                 }
@@ -100,7 +104,7 @@ fun EntryScreen(
                 Text(
                     text = "Satu aplikasi untuk mencatat transaksi, memantau ringkasan, dan menjaga pengingat finansial tetap teratur.",
                     style = MaterialTheme.typography.bodyLarge,
-                    color = ui.secondaryText
+                    color = ui.secondaryTextReadable
                 )
 
                 Spacer(Modifier.height(24.dp))
@@ -158,7 +162,7 @@ fun EntryScreen(
                     border = BorderStroke(1.dp, ui.outline),
                     colors = ButtonDefaults.outlinedButtonColors(
                         containerColor = ui.surface,
-                        contentColor = ui.secondaryText
+                        contentColor = ui.secondaryTextReadable
                     )
                 ) {
                     Text("Sudah punya akun? Masuk")
@@ -204,7 +208,7 @@ private fun FeatureRow(
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodySmall,
-                color = ui.secondaryText
+                color = ui.secondaryTextReadable
             )
         }
     }

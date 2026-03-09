@@ -13,3 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+.kotlin/
+.codex/
+.gradle-user/
+.idea/appInsightsSettings.xml
+.idea/deploymentTargetSelector.xml

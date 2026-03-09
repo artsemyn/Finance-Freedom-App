@@ -1,7 +1,30 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+}
+
+val localProperties = Properties().apply {
+    val localFile = rootProject.file("local.properties")
+    if (localFile.exists()) {
+        localFile.inputStream().use { load(it) }
+    }
+}
+
+val rawBaseUrl = (
+    localProperties.getProperty("FINANCE_BASE_URL")
+        ?: System.getenv("FINANCE_BASE_URL")
+        ?: "http://10.0.2.2:3000/"
+).trim()
+
+val baseUrl = if (rawBaseUrl.endsWith("/")) rawBaseUrl else "$rawBaseUrl/"
+val hasGoogleServicesConfig = file("google-services.json").exists()
+
+if (hasGoogleServicesConfig) {
+    apply(plugin = "com.google.gms.google-services")
+    apply(plugin = "com.google.firebase.crashlytics")
 }
 
 android {
@@ -14,16 +37,18 @@ android {
         applicationId = "com.example.financefreedom"
         minSdk = 30
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
-        buildConfigField("String", "BASE_URL", "\"https://finance-backend-gold.vercel.app/\"")
+        versionCode = 2
+        versionName = "1.1.0"
+        buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
+        buildConfigField("Boolean", "FIREBASE_ENABLED", hasGoogleServicesConfig.toString())
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -57,6 +82,8 @@ dependencies {
     implementation(libs.retrofit.converter.gson)
     implementation(libs.okhttp.core)
     implementation(libs.okhttp.logging.interceptor)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.crashlytics)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
@@ -65,6 +92,9 @@ dependencies {
     implementation(libs.androidx.compose.animation)
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
+    testImplementation(libs.androidx.work.testing)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

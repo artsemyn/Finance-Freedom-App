@@ -93,7 +93,7 @@ fun RegisterScreen(
                 Text(
                     text = "Daftar untuk mulai mengatur transaksi, laporan, dan progres finansialmu.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = ui.secondaryText
+                    color = ui.secondaryTextReadable
                 )
 
                 Spacer(Modifier.height(24.dp))
@@ -111,7 +111,7 @@ fun RegisterScreen(
                         Text(
                             text = "REGISTER",
                             style = MaterialTheme.typography.labelMedium,
-                            color = ui.mutedText
+                            color = ui.mutedTextReadable
                         )
 
                         OutlinedTextField(
@@ -240,7 +240,7 @@ fun RegisterScreen(
                 border = BorderStroke(1.dp, ui.outline),
                 colors = ButtonDefaults.outlinedButtonColors(
                     containerColor = ui.surface,
-                    contentColor = ui.secondaryText
+                    contentColor = ui.secondaryTextReadable
                 )
             ) {
                 Text("Sudah punya akun? Masuk")
@@ -274,3 +274,4 @@ private fun RegisterScreenPreview() {
         )
     }
 }
+

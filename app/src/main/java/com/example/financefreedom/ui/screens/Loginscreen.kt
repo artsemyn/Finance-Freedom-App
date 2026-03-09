@@ -83,7 +83,7 @@ fun LoginScreen(
                 Text(
                     text = "Lanjutkan untuk melihat catatan keuangan dan aktivitas terbaru.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = ui.secondaryText
+                    color = ui.secondaryTextReadable
                 )
 
                 Spacer(Modifier.height(24.dp))
@@ -101,7 +101,7 @@ fun LoginScreen(
                         Text(
                             text = "LOGIN",
                             style = MaterialTheme.typography.labelMedium,
-                            color = ui.mutedText
+                            color = ui.mutedTextReadable
                         )
 
                         OutlinedTextField(
@@ -183,7 +183,7 @@ fun LoginScreen(
                 border = BorderStroke(1.dp, ui.outline),
                 colors = ButtonDefaults.outlinedButtonColors(
                     containerColor = ui.surface,
-                    contentColor = ui.secondaryText
+                    contentColor = ui.secondaryTextReadable
                 )
             ) {
                 Text("Belum punya akun? Daftar")
@@ -203,3 +203,4 @@ private fun LegacyLoginScreenPreview() {
         )
     }
 }
+

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1011385482799",
+    "project_id": "finance-freedom-ee44e",
+    "storage_bucket": "finance-freedom-ee44e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1011385482799:android:253aaeb4b574c7bbf310da",
+        "android_client_info": {
+          "package_name": "com.example.financefreedom"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcJxvxEYiCnuA7acUOk6eI7m57vccA3IY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

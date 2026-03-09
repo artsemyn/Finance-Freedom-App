@@ -6,6 +6,7 @@ import com.example.financefreedom.data.remote.FinanceApiService
 import com.example.financefreedom.domain.model.MonthlySummary
 import com.example.financefreedom.domain.model.TransactionCategories
 import com.example.financefreedom.domain.model.TransactionItem
+import com.example.financefreedom.utils.CrashLogger
 import com.google.gson.JsonElement
 import retrofit2.HttpException
 import java.io.IOException
@@ -202,6 +203,7 @@ class TransactionRepositoryImpl(
             }
             else -> IllegalStateException(throwable.message ?: "Terjadi kesalahan tak terduga.")
         }
+        CrashLogger.logException(mapped, "transaction_repository_error")
         return Result.failure(mapped)
     }
 

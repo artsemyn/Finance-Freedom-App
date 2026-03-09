@@ -1,4 +1,4 @@
-
+﻿
 package com.example.financefreedom.ui.add
 
 import android.app.DatePickerDialog
@@ -33,13 +33,13 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Notes
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.ArrowDownward
 import androidx.compose.material.icons.rounded.ArrowUpward
 import androidx.compose.material.icons.rounded.AttachMoney
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.DateRange
-import androidx.compose.material.icons.rounded.Notes
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Title
 import androidx.compose.material3.Button
@@ -49,6 +49,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -67,6 +68,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -142,6 +144,7 @@ fun AddScreen(
     var category by remember { mutableStateOf("") }
     var typeIncome by remember { mutableStateOf(false) }
     val today = remember { LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) }
+    var transactionDate by remember { mutableStateOf(today) }
 
     var reminderSubmitting by remember { mutableStateOf(false) }
     var reminderSuccess by remember { mutableStateOf(false) }
@@ -239,9 +242,24 @@ fun AddScreen(
                     FieldDivider()
 
                     ReadOnlyField(
+                        modifier = Modifier.testTag("transaction_date_field"),
                         icon = Icons.Rounded.DateRange,
                         label = "Tanggal",
-                        value = today
+                        value = transactionDate,
+                        suffix = "Pilih",
+                        onClick = {
+                            val current = runCatching { LocalDate.parse(transactionDate.take(10)) }
+                                .getOrElse { LocalDate.now() }
+                            DatePickerDialog(
+                                context,
+                                { _, year, month, dayOfMonth ->
+                                    transactionDate = LocalDate.of(year, month + 1, dayOfMonth).toString()
+                                },
+                                current.year,
+                                current.monthValue - 1,
+                                current.dayOfMonth
+                            ).show()
+                        }
                     )
                 }
 
@@ -289,7 +307,7 @@ fun AddScreen(
                                 amount = amountValue,
                                 type = type,
                                 category = category,
-                                date = today,
+                                date = transactionDate,
                                 note = ""
                             )
                             isLoading = false
@@ -298,6 +316,7 @@ fun AddScreen(
                                 title = ""
                                 amountField = TextFieldValue("")
                                 category = ""
+                                transactionDate = today
                             }.onFailure {
                                 errorMsg = it.message ?: "Gagal menambahkan transaksi."
                             }
@@ -311,6 +330,7 @@ fun AddScreen(
                         onValueChange = { reminderTitle = it },
                         label = { Text("Judul reminder") },
                         singleLine = true,
+                        colors = financeOutlinedFieldColors(),
                         modifier = Modifier.fillMaxWidth()
                     )
                     OutlinedTextField(
@@ -322,6 +342,7 @@ fun AddScreen(
                         label = { Text("Jumlah") },
                         placeholder = { Text("Rp 0") },
                         singleLine = true,
+                        colors = financeOutlinedFieldColors(),
                         modifier = Modifier.fillMaxWidth()
                     )
 
@@ -359,6 +380,7 @@ fun AddScreen(
                         },
                         readOnly = true,
                         singleLine = true,
+                        colors = financeOutlinedFieldColors(),
                         modifier = Modifier.fillMaxWidth()
                     )
 
@@ -435,7 +457,7 @@ fun AddScreen(
 private fun AddHeader(activeTab: AddTab) {
     val ui = financeUiColors()
     val subtitle = if (activeTab == AddTab.TRANSACTION) "Transaksi" else "Reminder"
-    val trailingIcon = if (activeTab == AddTab.TRANSACTION) Icons.Rounded.Notes else Icons.Rounded.Notifications
+    val trailingIcon = if (activeTab == AddTab.TRANSACTION) Icons.AutoMirrored.Rounded.Notes else Icons.Rounded.Notifications
 
     Row(
         modifier = Modifier
@@ -457,7 +479,7 @@ private fun AddHeader(activeTab: AddTab) {
                     text = subtitle,
                     fontSize = 26.sp,
                     fontWeight = FontWeight.ExtraBold,
-                    color = ui.positive,
+                    color = ui.positiveText,
                     letterSpacing = (-0.5).sp
                 )
                 Spacer(Modifier.width(8.dp))
@@ -525,7 +547,7 @@ private fun AddTabButton(
         label = "add_tab_border_$label"
     )
     val textColor by animateColorAsState(
-        targetValue = if (isSelected) ui.positive else ui.mutedText,
+        targetValue = if (isSelected) ui.positiveText else ui.mutedTextReadable,
         animationSpec = tween(200),
         label = "add_tab_text_$label"
     )
@@ -597,8 +619,11 @@ private fun TypeTab(
         targetValue = if (isSelected) color.copy(alpha = 0.4f) else Color.Transparent,
         animationSpec = tween(200), label = "type_border"
     )
+    val ui = financeUiColors()
     val contentColor by animateColorAsState(
-        targetValue = if (isSelected) color else TextMuted,
+        targetValue = if (isSelected) {
+            if (color == AccentGreen) ui.positiveText else color
+        } else ui.secondaryTextReadable,
         animationSpec = tween(200), label = "type_content"
     )
 
@@ -645,6 +670,7 @@ private fun FormField(
     imeAction: ImeAction = ImeAction.Done,
     onImeAction: () -> Unit = {}
 ) {
+    val ui = financeUiColors()
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -660,20 +686,20 @@ private fun FormField(
         }
         Spacer(Modifier.width(14.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = label, fontSize = 10.sp, color = TextMuted, fontWeight = FontWeight.Medium, letterSpacing = 0.5.sp)
+            Text(text = label, fontSize = 10.sp, color = ui.secondaryTextReadable, fontWeight = FontWeight.Medium, letterSpacing = 0.5.sp)
             Spacer(Modifier.height(4.dp))
             BasicTextField(
                 value = value,
                 onValueChange = onValueChange,
                 singleLine = true,
-                textStyle = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = TextPrimary),
-                cursorBrush = SolidColor(AccentGreen),
+                textStyle = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = ui.primaryText),
+                cursorBrush = SolidColor(ui.accent),
                 keyboardOptions = KeyboardOptions(keyboardType = keyboardType, imeAction = imeAction),
                 keyboardActions = KeyboardActions(onAny = { onImeAction() }),
                 decorationBox = { inner ->
                     Box {
                         if (value.isEmpty()) {
-                            Text(text = placeholder, fontSize = 14.sp, color = TextMuted, fontWeight = FontWeight.Normal)
+                            Text(text = placeholder, fontSize = 14.sp, color = ui.secondaryTextReadable, fontWeight = FontWeight.Normal)
                         }
                         inner()
                     }
@@ -684,9 +710,23 @@ private fun FormField(
 }
 
 @Composable
-private fun ReadOnlyField(icon: ImageVector, label: String, value: String) {
+private fun ReadOnlyField(
+    modifier: Modifier = Modifier,
+    icon: ImageVector,
+    label: String,
+    value: String,
+    suffix: String,
+    onClick: () -> Unit
+) {
+    val ui = financeUiColors()
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
@@ -700,17 +740,17 @@ private fun ReadOnlyField(icon: ImageVector, label: String, value: String) {
         }
         Spacer(Modifier.width(14.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = label, fontSize = 10.sp, color = TextMuted, fontWeight = FontWeight.Medium, letterSpacing = 0.5.sp)
+            Text(text = label, fontSize = 10.sp, color = ui.secondaryTextReadable, fontWeight = FontWeight.Medium, letterSpacing = 0.5.sp)
             Spacer(Modifier.height(4.dp))
-            Text(text = value, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = TextPrimary)
+            Text(text = value, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = ui.primaryText)
         }
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(6.dp))
-                .background(BgCardAlt)
+                .background(ui.surfaceAlt)
                 .padding(horizontal = 8.dp, vertical = 3.dp)
         ) {
-            Text(text = "Hari ini", fontSize = 10.sp, color = TextMuted, fontWeight = FontWeight.Medium)
+            Text(text = suffix, fontSize = 10.sp, color = ui.secondaryTextReadable, fontWeight = FontWeight.Medium)
         }
     }
 }
@@ -738,6 +778,7 @@ private fun MoneyFormField(
     imeAction: ImeAction = ImeAction.Done,
     onImeAction: () -> Unit = {}
 ) {
+    val ui = financeUiColors()
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -753,20 +794,20 @@ private fun MoneyFormField(
         }
         Spacer(Modifier.width(14.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(text = label, fontSize = 10.sp, color = TextMuted, fontWeight = FontWeight.Medium, letterSpacing = 0.5.sp)
+            Text(text = label, fontSize = 10.sp, color = ui.secondaryTextReadable, fontWeight = FontWeight.Medium, letterSpacing = 0.5.sp)
             Spacer(Modifier.height(4.dp))
             BasicTextField(
                 value = value,
                 onValueChange = onValueChange,
                 singleLine = true,
-                textStyle = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = TextPrimary),
-                cursorBrush = SolidColor(AccentGreen),
+                textStyle = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = ui.primaryText),
+                cursorBrush = SolidColor(ui.accent),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = imeAction),
                 keyboardActions = KeyboardActions(onAny = { onImeAction() }),
                 decorationBox = { inner ->
                     Box {
                         if (value.text.isEmpty()) {
-                            Text(text = placeholder, fontSize = 14.sp, color = TextMuted, fontWeight = FontWeight.Normal)
+                            Text(text = placeholder, fontSize = 14.sp, color = ui.secondaryTextReadable, fontWeight = FontWeight.Normal)
                         }
                         inner()
                     }
@@ -801,7 +842,7 @@ private fun CategoryGrid(
         Text(
             text = "Kategori belum tersedia.",
             fontSize = 12.sp,
-            color = ui.mutedText,
+            color = ui.mutedTextReadable,
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
         )
         return
@@ -827,7 +868,7 @@ private fun CategoryGrid(
                         animationSpec = tween(200), label = "cat_border_$cat"
                     )
                     val textColor by animateColorAsState(
-                        targetValue = if (isSelected) ui.positive else ui.secondaryText,
+                        targetValue = if (isSelected) ui.positiveText else ui.secondaryTextReadable,
                         animationSpec = tween(200), label = "cat_text_$cat"
                     )
 
@@ -867,6 +908,7 @@ private fun SelectField(
     options: List<String>,
     onSelect: (String) -> Unit
 ) {
+    val ui = financeUiColors()
     Column {
         OutlinedTextField(
             value = value,
@@ -874,6 +916,7 @@ private fun SelectField(
             label = { Text(label) },
             readOnly = true,
             singleLine = true,
+            colors = financeOutlinedFieldColors(),
             modifier = Modifier.fillMaxWidth()
         )
         Box(modifier = Modifier.fillMaxWidth()) {
@@ -904,7 +947,7 @@ private fun SectionLabel(text: String) {
         text = text,
         fontSize = 11.sp,
         fontWeight = FontWeight.Medium,
-        color = ui.mutedText,
+        color = ui.mutedTextReadable,
         letterSpacing = 1.5.sp,
         modifier = Modifier.padding(horizontal = 20.dp)
     )
@@ -917,10 +960,11 @@ private fun SubmitButton(
     isIncome: Boolean,
     onClick: () -> Unit
 ) {
+    val ui = financeUiColors()
     val accentColor = if (isIncome) AccentGreen else AccentRed
     val bgColor = if (isEnabled) accentColor.copy(alpha = 0.15f) else BgCard
     val borderColor = if (isEnabled) accentColor.copy(alpha = 0.4f) else DividerCol
-    val textColor = if (isEnabled) accentColor else TextMuted
+    val textColor = if (isEnabled) ui.primaryText else ui.secondaryTextReadable
 
     Box(
         modifier = Modifier
@@ -974,9 +1018,20 @@ private fun SubmitButton(
 }
 
 @Composable
+private fun financeOutlinedFieldColors() = OutlinedTextFieldDefaults.colors(
+    focusedTextColor = financeUiColors().primaryText,
+    unfocusedTextColor = financeUiColors().primaryText,
+    focusedLabelColor = financeUiColors().secondaryText,
+    unfocusedLabelColor = financeUiColors().secondaryText,
+    focusedPlaceholderColor = financeUiColors().secondaryText,
+    unfocusedPlaceholderColor = financeUiColors().secondaryText,
+    cursorColor = financeUiColors().accent
+)
+
+@Composable
 private fun StatusBanner(message: String, isSuccess: Boolean) {
     val color = if (isSuccess) AccentGreen else AccentRed
-    val icon = if (isSuccess) Icons.Rounded.CheckCircle else Icons.Rounded.Notes
+    val icon = if (isSuccess) Icons.Rounded.CheckCircle else Icons.AutoMirrored.Rounded.Notes
 
     Row(
         modifier = Modifier
@@ -1064,3 +1119,5 @@ private fun AddScreenPreview() {
         )
     }
 }
+
+

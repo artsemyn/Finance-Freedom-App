@@ -13,6 +13,7 @@ import com.example.financefreedom.data.repository.AuthRepository
 import com.example.financefreedom.data.repository.ReminderRepository
 import com.example.financefreedom.data.repository.SavingsRepository
 import com.example.financefreedom.data.repository.TransactionRepository
+import com.example.financefreedom.utils.CrashLogger
 import com.example.financefreedom.ui.add.AddScreen
 import com.example.financefreedom.ui.auth.LoginScreen
 import com.example.financefreedom.ui.history.HistoryScreen
@@ -61,6 +62,7 @@ fun AppNavGraph(
 
         // ── Auth / Onboarding ────────────────────────────────────────────────
         composable(Routes.ENTRY) {
+            LaunchedEffect(Unit) { CrashLogger.setScreen("entry") }
             EntryScreen(
                 onGetStarted = { navController.navigate(Routes.REGISTER) },
                 onLogin      = { navController.navigate(Routes.LOGIN) }
@@ -68,6 +70,7 @@ fun AppNavGraph(
         }
 
         composable(Routes.LOGIN) {
+            LaunchedEffect(Unit) { CrashLogger.setScreen("login") }
             LoginScreen(
                 authRepository = authRepository,
                 onLoginSuccess = {
@@ -85,6 +88,7 @@ fun AppNavGraph(
         }
 
         composable(Routes.REGISTER) {
+            LaunchedEffect(Unit) { CrashLogger.setScreen("register") }
             RegisterScreen(
                 authRepository = authRepository,
                 onRegisterSuccess = {
@@ -103,6 +107,7 @@ fun AppNavGraph(
 
         // ── Main Tabs ────────────────────────────────────────────────────────
         composable(Routes.HOME) {
+            LaunchedEffect(Unit) { CrashLogger.setScreen("home") }
             MainTabsScaffold(navController = navController) {
                 HomeScreen(
                     transactionRepository = transactionRepository,
@@ -115,21 +120,25 @@ fun AppNavGraph(
             }
         }
         composable(Routes.REPORT) {
+            LaunchedEffect(Unit) { CrashLogger.setScreen("report") }
             MainTabsScaffold(navController = navController) {
                 ReportScreen(transactionRepository = transactionRepository)
             }
         }
         composable(Routes.REMINDER) {
+            LaunchedEffect(Unit) { CrashLogger.setScreen("reminder") }
             MainTabsScaffold(navController = navController) {
                 ReminderScreen(reminderRepository = reminderRepository)
             }
         }
         composable(Routes.HISTORY) {
+            LaunchedEffect(Unit) { CrashLogger.setScreen("history") }
             MainTabsScaffold(navController = navController) {
                 HistoryScreen(transactionRepository = transactionRepository)
             }
         }
         composable(Routes.PROFILE) {
+            LaunchedEffect(Unit) { CrashLogger.setScreen("profile") }
             MainTabsScaffold(navController = navController) {
                 ProfileScreen(
                     authRepository = authRepository,
@@ -146,12 +155,14 @@ fun AppNavGraph(
             }
         }
         composable(Routes.SAVINGS) {
+            LaunchedEffect(Unit) { CrashLogger.setScreen("savings") }
             SavingsScreen(
                 savingsRepository = savingsRepository,
                 onBack = { navController.popBackStack() }
             )
         }
         composable(Routes.ADD) {
+            LaunchedEffect(Unit) { CrashLogger.setScreen("add") }
             MainTabsScaffold(navController = navController) {
                 AddScreen(
                     transactionRepository = transactionRepository,

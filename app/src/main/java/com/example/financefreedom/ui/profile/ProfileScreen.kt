@@ -1,4 +1,4 @@
-package com.example.financefreedom.ui.profile
+﻿package com.example.financefreedom.ui.profile
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -28,11 +28,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.CameraAlt
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Info
-import androidx.compose.material.icons.rounded.Logout
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material3.AlertDialog
@@ -74,7 +74,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 
-// ─── Design Tokens ────────────────────────────────────────────────────────────
+// â”€â”€â”€ Design Tokens â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 private val BgDeep = Color(0xFFDFDFDF)
 private val BgCard = Color(0xFFF7F7F4)
 private val BgCardAlt = Color(0xFFE8EFE8)
@@ -85,7 +85,7 @@ private val TextSecond = Color(0xFF47615B)
 private val TextMuted = Color(0xFF62716B)
 private val DividerCol = Color(0xFFD0D0CA)
 
-// ─── Main Screen ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ Main Screen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 fun ProfileScreen(
@@ -135,7 +135,7 @@ fun ProfileScreen(
             }
     }
 
-    // ── Logout Confirmation Dialog ─────────────────────────────────────────
+    // â”€â”€ Logout Confirmation Dialog â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if (showLogoutDialog) {
         LogoutDialog(
             isLoggingOut = isLoggingOut,
@@ -160,10 +160,10 @@ fun ProfileScreen(
                 .statusBarsPadding()
                 .verticalScroll(rememberScrollState())
         ) {
-            // ── Header ────────────────────────────────────────────────────
+            // â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             ProfileHeader()
 
-            // ── Avatar + Email Card ───────────────────────────────────────
+            // â”€â”€ Avatar + Email Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             AvatarCard(
                 email           = profileEmail,
                 isLoading       = isLoading,
@@ -173,7 +173,7 @@ fun ProfileScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            // ── Error banner ──────────────────────────────────────────────
+            // â”€â”€ Error banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             AnimatedVisibility(
                 visible = !errorMessage.isNullOrBlank(),
                 enter   = fadeIn(tween(300)) + slideInVertically(tween(300))
@@ -185,7 +185,7 @@ fun ProfileScreen(
                 Spacer(Modifier.height(16.dp))
             }
 
-            // ── Info Items ────────────────────────────────────────────────
+            // â”€â”€ Info Items â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             if (!isLoading) {
                 Spacer(Modifier.height(8.dp))
                 SectionLabel("AKUN")
@@ -228,7 +228,7 @@ fun ProfileScreen(
 
             Spacer(Modifier.height(32.dp))
 
-            // ── Logout Button ─────────────────────────────────────────────
+            // â”€â”€ Logout Button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             LogoutButton(
                 isLoading = isLoggingOut,
                 onClick   = { showLogoutDialog = true }
@@ -239,7 +239,7 @@ fun ProfileScreen(
     }
 }
 
-// ─── Header ───────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 private fun ProfileHeader() {
@@ -263,7 +263,7 @@ private fun ProfileHeader() {
             Text(
                 text     = "Kelola akun kamu",
                 fontSize = 14.sp,
-                color    = ui.secondaryText,
+                color    = ui.secondaryTextReadable,
                 fontWeight = FontWeight.Medium
             )
         }
@@ -286,7 +286,7 @@ private fun ProfileHeader() {
     }
 }
 
-// ─── Avatar Card ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ Avatar Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 private fun AvatarCard(
@@ -384,14 +384,14 @@ private fun AvatarCard(
             Text(
                 text       = if (profilePhotoPath != null) "Ketuk untuk ganti foto" else "Ketuk untuk tambah foto",
                 fontSize   = 11.sp,
-                color      = ui.mutedText,
+                color      = ui.mutedTextReadable,
                 fontWeight = FontWeight.Medium
             )
 
             // Email / loading
             if (isLoading) {
                 CircularProgressIndicator(
-                    color       = ui.positive,
+                    color      = ui.positiveText,
                     strokeWidth = 2.dp,
                     modifier    = Modifier.size(20.dp)
                 )
@@ -426,7 +426,7 @@ private fun AvatarCard(
                             Text(
                                 text       = "Online",
                                 fontSize   = 11.sp,
-                                color      = ui.positive,
+                                color      = ui.positiveText,
                                 fontWeight = FontWeight.SemiBold
                             )
                         }
@@ -437,7 +437,7 @@ private fun AvatarCard(
     }
 }
 
-// ─── Section Label ────────────────────────────────────────────────────────────
+// â”€â”€â”€ Section Label â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 private fun SectionLabel(text: String) {
@@ -447,7 +447,7 @@ private fun SectionLabel(text: String) {
         text          = text,
         fontSize      = 11.sp,
         fontWeight    = FontWeight.Medium,
-        color         = ui.mutedText,
+        color         = ui.mutedTextReadable,
         letterSpacing = 1.5.sp,
         modifier      = Modifier.padding(horizontal = 20.dp)
     )
@@ -479,7 +479,7 @@ private fun ThemeModeCard(
             Text(
                 text = "Pilih warna aplikasi: sistem, terang, atau gelap.",
                 fontSize = 12.sp,
-                color = ui.mutedText
+                color = ui.mutedTextReadable
             )
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -512,7 +512,7 @@ private fun ThemeModeChip(
     val ui = financeUiColors()
     val backgroundColor = if (isSelected) ui.accent.copy(alpha = 0.16f) else ui.surfaceAlt.copy(alpha = 0.8f)
     val borderColor = if (isSelected) ui.accent.copy(alpha = 0.45f) else ui.outline
-    val textColor = if (isSelected) ui.accent else ui.secondaryText
+    val textColor = if (isSelected) ui.accent else ui.secondaryTextReadable
 
     Box(
         modifier = modifier
@@ -532,7 +532,7 @@ private fun ThemeModeChip(
     }
 }
 
-// ─── Profile Info Card ────────────────────────────────────────────────────────
+// â”€â”€â”€ Profile Info Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 private fun ProfileInfoCard(content: @Composable () -> Unit) {
@@ -546,7 +546,7 @@ private fun ProfileInfoCard(content: @Composable () -> Unit) {
     }
 }
 
-// ─── Info Row ─────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Info Row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 private fun InfoRow(
@@ -584,7 +584,7 @@ private fun InfoRow(
         Text(
             text       = label,
             fontSize   = 13.sp,
-            color      = ui.secondaryText,
+            color      = ui.secondaryTextReadable,
             fontWeight = FontWeight.Medium,
             modifier   = Modifier.weight(1f)
         )
@@ -611,7 +611,7 @@ private fun RowDivider() {
     )
 }
 
-// ─── Logout Button ────────────────────────────────────────────────────────────
+// â”€â”€â”€ Logout Button â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 private fun LogoutButton(isLoading: Boolean, onClick: () -> Unit) {
@@ -642,7 +642,7 @@ private fun LogoutButton(isLoading: Boolean, onClick: () -> Unit) {
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Icon(
-                    imageVector        = Icons.Rounded.Logout,
+                    imageVector        = Icons.AutoMirrored.Rounded.Logout,
                     contentDescription = "Logout",
                     tint               = ui.negative,
                     modifier           = Modifier.size(18.dp)
@@ -658,7 +658,7 @@ private fun LogoutButton(isLoading: Boolean, onClick: () -> Unit) {
     }
 }
 
-// ─── Logout Confirmation Dialog ───────────────────────────────────────────────
+// â”€â”€â”€ Logout Confirmation Dialog â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 private fun LogoutDialog(
@@ -684,7 +684,7 @@ private fun LogoutDialog(
             Text(
                 text     = "Akun kamu akan dikeluarkan dari aplikasi ini. Kamu dapat kembali masuk melalui login",
                 fontSize = 13.sp,
-                color    = ui.secondaryText
+                color    = ui.secondaryTextReadable
             )
         },
         confirmButton = {
@@ -705,7 +705,7 @@ private fun LogoutDialog(
                 ) {
                     Text(
                         text = "Batal",
-                        color = ui.secondaryText,
+                        color = ui.secondaryTextReadable,
                         fontWeight = FontWeight.Medium,
                         fontSize = 13.sp
                     )
@@ -741,7 +741,7 @@ private fun LogoutDialog(
     )
 }
 
-// ─── Error Banner ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ Error Banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 private fun ErrorBanner(message: String, modifier: Modifier = Modifier) {
@@ -767,7 +767,7 @@ private fun ErrorBanner(message: String, modifier: Modifier = Modifier) {
     }
 }
 
-// ─── Click Helper ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ Click Helper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 private fun Modifier.clickableSafe(onClick: () -> Unit): Modifier =
     this.then(
@@ -803,3 +803,5 @@ private fun ProfileScreenPreview() {
         )
     }
 }
+
+

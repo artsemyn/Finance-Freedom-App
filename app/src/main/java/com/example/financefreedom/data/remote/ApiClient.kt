@@ -17,6 +17,7 @@ object ApiClient {
             } else {
                 HttpLoggingInterceptor.Level.NONE
             }
+            redactHeader("Authorization")
         }
 
         val authInterceptor = Interceptor { chain ->

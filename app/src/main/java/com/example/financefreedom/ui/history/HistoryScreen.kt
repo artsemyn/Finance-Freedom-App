@@ -1,4 +1,4 @@
-package com.example.financefreedom.ui.history
+﻿package com.example.financefreedom.ui.history
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
@@ -30,7 +30,7 @@ import androidx.compose.material.icons.rounded.ArrowDownward
 import androidx.compose.material.icons.rounded.ArrowUpward
 import androidx.compose.material.icons.rounded.History
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -64,7 +64,7 @@ import com.example.financefreedom.ui.theme.financeUiColors
 import java.text.NumberFormat
 import java.util.Locale
 
-// ─── Design Tokens ────────────────────────────────────────────────────────────
+// â”€â”€â”€ Design Tokens â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 private val BgDeep = Color(0xFFDFDFDF)
 private val BgCard = Color(0xFFF7F7F4)
 private val BgCardAlt = Color(0xFFE8EFE8)
@@ -76,7 +76,7 @@ private val TextMuted = Color(0xFF62716B)
 private val DividerCol = Color(0xFFD0D0CA)
 
 private fun formatRupiah(amount: Double): String {
-    val fmt = NumberFormat.getNumberInstance(Locale("id", "ID"))
+    val fmt = NumberFormat.getNumberInstance(Locale.forLanguageTag("id-ID"))
     return "Rp ${fmt.format(amount)}"
 }
 
@@ -85,7 +85,7 @@ private fun isIncome(type: String) =
 
 private val filterOptions = listOf("Semua", "Pemasukan", "Pengeluaran")
 
-// ─── Main Screen ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ Main Screen â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 fun HistoryScreen(transactionRepository: TransactionRepository) {
@@ -116,12 +116,12 @@ fun HistoryScreen(transactionRepository: TransactionRepository) {
                 .fillMaxSize()
                 .statusBarsPadding()
         ) {
-            // ── Header ────────────────────────────────────────────────────
+            // â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             item {
                 HistoryHeader()
             }
 
-            // ── Summary + Filter ──────────────────────────────────────────
+            // â”€â”€ Summary + Filter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             if (!isLoading && transactions.isNotEmpty()) {
                 item {
                     SummaryRow(transactions = transactions)
@@ -142,16 +142,16 @@ fun HistoryScreen(transactionRepository: TransactionRepository) {
                             text          = "TRANSAKSI",
                             fontSize      = 11.sp,
                             fontWeight    = FontWeight.Medium,
-                            color         = TextMuted,
+                            color         = ui.mutedTextReadable,
                             letterSpacing = 1.5.sp
                         )
-                        Text(text = "${filtered.size} data", fontSize = 12.sp, color = TextMuted)
+                        Text(text = "${filtered.size} data", fontSize = 12.sp, color         = ui.mutedTextReadable)
                     }
                     Spacer(Modifier.height(10.dp))
                 }
             }
 
-            // ── Loading ───────────────────────────────────────────────────
+            // â”€â”€ Loading â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             if (isLoading) {
                 item {
                     Box(
@@ -169,7 +169,7 @@ fun HistoryScreen(transactionRepository: TransactionRepository) {
                 }
             }
 
-            // ── Error ─────────────────────────────────────────────────────
+            // â”€â”€ Error â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             if (!errorMessage.isNullOrBlank()) {
                 item {
                     ErrorBanner(
@@ -179,12 +179,12 @@ fun HistoryScreen(transactionRepository: TransactionRepository) {
                 }
             }
 
-            // ── Empty ─────────────────────────────────────────────────────
+            // â”€â”€ Empty â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             if (!isLoading && filtered.isEmpty() && errorMessage.isNullOrBlank()) {
                 item { EmptyState(isFiltered = activeFilter != "Semua") }
             }
 
-            // ── List ──────────────────────────────────────────────────────
+            // â”€â”€ List â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             itemsIndexed(filtered) { index, trx ->
                 TransactionRow(
                     trx    = trx,
@@ -197,7 +197,7 @@ fun HistoryScreen(transactionRepository: TransactionRepository) {
     }
 }
 
-// ─── Header ───────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Header â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 private fun HistoryHeader() {
@@ -221,7 +221,7 @@ private fun HistoryHeader() {
             Text(
                 text       = "Semua aktivitas transaksi",
                 fontSize   = 14.sp,
-                color      = ui.secondaryText,
+                color      = ui.secondaryTextReadable,
                 fontWeight = FontWeight.Medium
             )
         }
@@ -243,7 +243,7 @@ private fun HistoryHeader() {
     }
 }
 
-// ─── Summary Row ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ Summary Row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 private fun SummaryRow(transactions: List<TransactionItem>) {
@@ -302,14 +302,14 @@ private fun MiniStatCard(
                 Icon(imageVector = icon, contentDescription = null, tint = color, modifier = Modifier.size(16.dp))
             }
             Column {
-                Text(text = label, fontSize = 10.sp, color = ui.mutedText, fontWeight = FontWeight.Medium, letterSpacing = 0.3.sp)
-                Text(text = formatRupiah(amount), fontSize = 13.sp, fontWeight = FontWeight.Bold, color = color)
+                Text(text = label, fontSize = 10.sp, color = ui.mutedTextReadable, fontWeight = FontWeight.Medium, letterSpacing = 0.3.sp)
+                Text(text = formatRupiah(amount), fontSize = 13.sp, fontWeight = FontWeight.Bold, color = if (color == AccentGreen) ui.positiveText else color)
             }
         }
     }
 }
 
-// ─── Filter Chips ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ Filter Chips â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 private fun FilterChipsRow(activeFilter: String, onFilterSelected: (String) -> Unit) {
@@ -340,7 +340,7 @@ private fun FilterChip(label: String, isSelected: Boolean, onClick: () -> Unit) 
         animationSpec = tween(200), label = "chip_border"
     )
     val textColor by animateColorAsState(
-        targetValue   = if (isSelected) ui.positive else ui.secondaryText,
+        targetValue   = if (isSelected) ui.positiveText else ui.secondaryTextReadable,
         animationSpec = tween(200), label = "chip_text"
     )
 
@@ -365,7 +365,7 @@ private fun FilterChip(label: String, isSelected: Boolean, onClick: () -> Unit) 
     }
 }
 
-// ─── Transaction Row ──────────────────────────────────────────────────────────
+// â”€â”€â”€ Transaction Row â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 private fun TransactionRow(trx: TransactionItem, isLast: Boolean) {
@@ -423,10 +423,10 @@ private fun TransactionRow(trx: TransactionItem, isLast: Boolean) {
                                 .background(ui.surfaceAlt)
                                 .padding(horizontal = 6.dp, vertical = 2.dp)
                         ) {
-                            Text(text = trx.category, fontSize = 10.sp, color = ui.secondaryText, fontWeight = FontWeight.Medium)
+                            Text(text = trx.category, fontSize = 10.sp, color = ui.secondaryTextReadable, fontWeight = FontWeight.Medium)
                         }
-                        Text(text = "·", fontSize = 10.sp, color = TextMuted)
-                        Text(text = trx.date, fontSize = 11.sp, color = ui.mutedText)
+                        Text(text = "Â·", fontSize = 10.sp, color         = ui.mutedTextReadable)
+                        Text(text = trx.date, fontSize = 11.sp, color = ui.mutedTextReadable)
                     }
                 }
             }
@@ -441,12 +441,12 @@ private fun TransactionRow(trx: TransactionItem, isLast: Boolean) {
                     color      = accentColor
                 )
                 Spacer(Modifier.height(2.dp))
-                Text(text = trx.type, fontSize = 10.sp, color = ui.mutedText, fontWeight = FontWeight.Medium)
+                Text(text = trx.type, fontSize = 10.sp, color = ui.mutedTextReadable, fontWeight = FontWeight.Medium)
             }
         }
 
         if (!isLast) {
-            Divider(
+            HorizontalDivider(
                 color    = ui.outline,
                 thickness = 0.5.dp,
                 modifier = Modifier.padding(start = 54.dp)
@@ -455,7 +455,7 @@ private fun TransactionRow(trx: TransactionItem, isLast: Boolean) {
     }
 }
 
-// ─── Error Banner ─────────────────────────────────────────────────────────────
+// â”€â”€â”€ Error Banner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 private fun ErrorBanner(message: String, modifier: Modifier = Modifier) {
@@ -476,7 +476,7 @@ private fun ErrorBanner(message: String, modifier: Modifier = Modifier) {
     }
 }
 
-// ─── Empty State ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ Empty State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 @Composable
 private fun EmptyState(isFiltered: Boolean) {
@@ -489,18 +489,18 @@ private fun EmptyState(isFiltered: Boolean) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text(text = if (isFiltered) "🔍" else "", fontSize = 40.sp)
+        Text(text = if (isFiltered) "ðŸ”" else "", fontSize = 40.sp)
         Text(
             text       = if (isFiltered) "Tidak ada hasil" else "Belum ada transaksi",
             fontSize   = 16.sp,
             fontWeight = FontWeight.SemiBold,
-            color      = ui.secondaryText
+            color      = ui.secondaryTextReadable
         )
         Text(
             text      = if (isFiltered) "Coba pilih filter yang lain"
             else "Riwayat transaksi kamu akan muncul di sini",
             fontSize  = 13.sp,
-            color     = ui.mutedText,
+            color     = ui.mutedTextReadable,
             textAlign = TextAlign.Center,
             modifier  = Modifier.padding(horizontal = 32.dp)
         )
@@ -542,3 +542,5 @@ private fun HistoryScreenPreview() {
         )
     }
 }
+
+

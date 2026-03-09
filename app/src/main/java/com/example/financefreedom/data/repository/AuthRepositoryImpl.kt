@@ -6,6 +6,7 @@ import com.example.financefreedom.data.local.TransactionCategoryCacheManager
 import com.example.financefreedom.data.remote.AuthRequest
 import com.example.financefreedom.data.remote.FinanceApiService
 import com.example.financefreedom.domain.model.UserProfile
+import com.example.financefreedom.utils.CrashLogger
 import retrofit2.HttpException
 import java.io.IOException
 import java.net.UnknownHostException
@@ -87,6 +88,7 @@ class AuthRepositoryImpl(
             }
             else -> IllegalStateException(throwable.message ?: "Terjadi kesalahan tak terduga.")
         }
+        CrashLogger.logException(mapped, "auth_repository_error")
         return Result.failure(mapped)
     }
 }

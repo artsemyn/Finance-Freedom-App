@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -90,7 +91,7 @@ fun LoginScreen(
                 Text(
                     text = "Akses dashboard keuangan, riwayat transaksi, dan laporan bulananmu.",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = ui.secondaryText
+                    color = ui.secondaryTextReadable
                 )
 
                 Spacer(Modifier.height(24.dp))
@@ -108,7 +109,7 @@ fun LoginScreen(
                         Text(
                             text = "LOGIN",
                             style = MaterialTheme.typography.labelMedium,
-                            color = ui.mutedText
+                            color = ui.mutedTextReadable
                         )
 
                         OutlinedTextField(
@@ -117,7 +118,9 @@ fun LoginScreen(
                                 email = it
                                 errorMessage = null
                             },
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag("login_email_field"),
                             label = { Text("Email") },
                             singleLine = true,
                             shape = RoundedCornerShape(18.dp)
@@ -129,7 +132,9 @@ fun LoginScreen(
                                 password = it
                                 errorMessage = null
                             },
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .testTag("login_password_field"),
                             label = { Text("Password") },
                             singleLine = true,
                             visualTransformation = PasswordVisualTransformation(),
@@ -164,7 +169,10 @@ fun LoginScreen(
                                 }
                             },
                             enabled = !isLoading && email.isNotBlank() && password.isNotBlank(),
-                            modifier = Modifier.fillMaxWidth().height(56.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                                .testTag("login_submit_button"),
                             shape = RoundedCornerShape(20.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = ui.accent,
@@ -185,7 +193,7 @@ fun LoginScreen(
                     border = BorderStroke(1.dp, ui.outline),
                     colors = ButtonDefaults.outlinedButtonColors(
                         containerColor = ui.surface,
-                        contentColor = ui.secondaryText
+                        contentColor = ui.secondaryTextReadable
                     )
                 ) {
                     Text("Belum punya akun? Daftar")
@@ -194,7 +202,7 @@ fun LoginScreen(
                 Text(
                     text = "Gunakan email aktif dan jangan simpan token di perangkat umum.",
                     style = MaterialTheme.typography.bodySmall,
-                    color = ui.mutedText
+                    color = ui.mutedTextReadable
                 )
             }
         }
@@ -226,3 +234,4 @@ private fun LoginScreenPreview() {
         )
     }
 }
+

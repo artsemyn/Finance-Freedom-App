@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,9 +22,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.Notifications
+import androidx.compose.material.icons.rounded.Payments
 import androidx.compose.material.icons.rounded.Savings
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -51,6 +52,8 @@ import com.example.financefreedom.domain.model.TransactionCategories
 import com.example.financefreedom.domain.model.TransactionItem
 import com.example.financefreedom.ui.components.FinanceAnimatedReveal
 import com.example.financefreedom.ui.components.FinanceCardSurface
+import com.example.financefreedom.ui.components.FinanceEmptyStateCard
+import com.example.financefreedom.ui.components.FinanceLoadingCardSkeleton
 import com.example.financefreedom.ui.components.FinanceMessageBanner
 import com.example.financefreedom.ui.theme.FinanceFreedomTheme
 import com.example.financefreedom.ui.theme.FinanceCorners
@@ -148,26 +151,24 @@ fun HomeScreen(
                 when {
                     state.isLoading -> {
                         item {
-                            Box(
+                            Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = 24.dp),
-                                contentAlignment = Alignment.Center
+                                    .padding(horizontal = FinanceSpacing.screenHorizontal),
+                                verticalArrangement = Arrangement.spacedBy(10.dp)
                             ) {
-                                CircularProgressIndicator(
-                                    color = ui.positive,
-                                    modifier = Modifier.size(32.dp),
-                                    strokeWidth = 2.dp
-                                )
+                                FinanceLoadingCardSkeleton(modifier = Modifier.fillMaxWidth())
+                                FinanceLoadingCardSkeleton(modifier = Modifier.fillMaxWidth())
                             }
                         }
                     }
 
                     state.transactions.isEmpty() -> {
                         item {
-                            FinanceMessageBanner(
-                                message = "Belum ada transaksi. Tambahkan data lewat tombol tambah di Home.",
-                                isError = false,
+                            FinanceEmptyStateCard(
+                                title = "Belum Ada Transaksi",
+                                description = "Tambahkan transaksi pertama Anda dari tombol tambah di Home.",
+                                icon = Icons.Rounded.Payments,
                                 modifier = Modifier.padding(horizontal = FinanceSpacing.screenHorizontal)
                             )
                         }
@@ -180,7 +181,7 @@ fun HomeScreen(
                                 modifier = Modifier.padding(horizontal = 20.dp),
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                color = ui.secondaryText
+                                color = ui.secondaryTextReadable
                             )
                         }
                         items(state.transactions.take(6)) { transaction ->
@@ -210,7 +211,7 @@ private fun QuickActionsCard(onOpenAdd: () -> Unit) {
         ) {
             Column {
                 Text("Quick Action", fontWeight = FontWeight.SemiBold, color = ui.primaryText)
-                Text("Catat transaksi baru", fontSize = 12.sp, color = ui.secondaryText)
+                Text("Catat transaksi baru", fontSize = 12.sp, color = ui.secondaryTextReadable)
             }
             Button(onClick = onOpenAdd) {
                 Text("Tambah transaksi")
@@ -239,7 +240,7 @@ private fun Header(onOpenReminder: () -> Unit) {
             Text(
                 text = "Ringkasan keuangan dan tabungan",
                 fontSize = 13.sp,
-                color = ui.secondaryText
+                color = ui.secondaryTextReadable
             )
         }
         Box(
@@ -271,16 +272,18 @@ private fun BalanceCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = FinanceSpacing.screenHorizontal),
-        cornerRadius = FinanceCorners.cardLarge
+        cornerRadius = FinanceCorners.cardLarge,
+        contentPadding = PaddingValues(0.dp)
     ) {
         Box(
             modifier = Modifier
+                .fillMaxWidth()
                 .clip(RoundedCornerShape(FinanceCorners.cardLarge))
                 .background(financeCardGradient())
-                .padding(6.dp)
+                .padding(FinanceSpacing.cardContent)
         ) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(text = "Saldo Bersih Bulan Ini", fontSize = 12.sp, color = ui.mutedText)
+            Text(text = "Saldo Bersih Bulan Ini", fontSize = 12.sp, color = ui.mutedTextReadable)
             Text(
                 text = formatRupiah(netBalance),
                 fontSize = 30.sp,
@@ -291,7 +294,7 @@ private fun BalanceCard(
                 Text(
                     text = "Masuk Bulan Ini: ${formatRupiah(totalIncome)}",
                     fontSize = 12.sp,
-                    color = ui.positive
+                    color = ui.positiveText
                 )
                 Text(
                     text = "Keluar Bulan Ini: ${formatRupiah(totalExpense)}",
@@ -345,7 +348,7 @@ private fun SavingsOverviewCard(
                 Icon(
                     imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
                     contentDescription = "Open savings",
-                    tint = ui.mutedText
+                    tint = ui.mutedTextReadable
                 )
             }
 
@@ -356,7 +359,7 @@ private fun SavingsOverviewCard(
                     "${savingsGoals.size} target aktif"
                 },
                 fontSize = 12.sp,
-                color = ui.secondaryText
+                color = ui.secondaryTextReadable
             )
             Text(
                 text = "${formatRupiah(totalCurrent)} / ${formatRupiah(totalTarget)}",
@@ -384,7 +387,7 @@ private fun SavingsOverviewCard(
             Text(
                 text = "Progress total: ${(progress * 100).toInt()}%",
                 fontSize = 12.sp,
-                color = ui.mutedText
+                color = ui.mutedTextReadable
             )
         }
     }
@@ -428,7 +431,7 @@ private fun UpcomingRemindersCard(
                 Icon(
                     imageVector = Icons.AutoMirrored.Rounded.ArrowForward,
                     contentDescription = "Open reminders",
-                    tint = ui.mutedText
+                    tint = ui.mutedTextReadable
                 )
             }
 
@@ -436,7 +439,7 @@ private fun UpcomingRemindersCard(
                 Text(
                     text = "Tidak ada reminder mendatang.",
                     fontSize = 12.sp,
-                    color = ui.secondaryText
+                    color = ui.secondaryTextReadable
                 )
             } else {
                 reminders.take(3).forEach { reminder ->
@@ -469,7 +472,7 @@ private fun ReminderRow(reminder: ReminderItem) {
             Text(
                 text = "Jatuh tempo: ${reminder.dueDate.take(10)}",
                 fontSize = 12.sp,
-                color = ui.secondaryText
+                color = ui.secondaryTextReadable
             )
         }
         Text(
@@ -506,7 +509,7 @@ private fun TransactionRow(transaction: TransactionItem) {
             )
             Text(
                 text = "${transaction.category} • ${transaction.date}",
-                color = ui.secondaryText,
+                color = ui.secondaryTextReadable,
                 fontSize = 12.sp
             )
         }
@@ -669,3 +672,6 @@ private fun HomeScreenPreview() {
         )
     }
 }
+
+
+

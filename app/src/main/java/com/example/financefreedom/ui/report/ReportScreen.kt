@@ -1,4 +1,4 @@
-package com.example.financefreedom.ui.report
+﻿package com.example.financefreedom.ui.report
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -22,7 +22,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.PieChart
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -52,6 +51,8 @@ import com.example.financefreedom.domain.model.TransactionCategories
 import com.example.financefreedom.domain.model.TransactionItem
 import com.example.financefreedom.ui.components.FinanceAnimatedReveal
 import com.example.financefreedom.ui.components.FinanceCardSurface
+import com.example.financefreedom.ui.components.FinanceEmptyStateCard
+import com.example.financefreedom.ui.components.FinanceLoadingCardSkeleton
 import com.example.financefreedom.ui.components.FinanceMessageBanner
 import com.example.financefreedom.ui.theme.FinanceCorners
 import com.example.financefreedom.ui.theme.FinanceFreedomTheme
@@ -96,17 +97,15 @@ fun ReportScreen(transactionRepository: TransactionRepository) {
 
                 if (state.isLoading) {
                     item {
-                        Box(
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 30.dp),
-                            contentAlignment = Alignment.Center
+                                .padding(horizontal = FinanceSpacing.screenHorizontal),
+                            verticalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            CircularProgressIndicator(
-                                color = ui.positive,
-                                strokeWidth = 2.dp,
-                                modifier = Modifier.size(32.dp)
-                            )
+                            FinanceLoadingCardSkeleton(modifier = Modifier.fillMaxWidth())
+                            FinanceLoadingCardSkeleton(modifier = Modifier.fillMaxWidth())
+                            FinanceLoadingCardSkeleton(modifier = Modifier.fillMaxWidth())
                         }
                     }
                 } else {
@@ -114,8 +113,7 @@ fun ReportScreen(transactionRepository: TransactionRepository) {
                         FinanceAnimatedReveal(index = 1) {
                             SummaryCards(
                                 income = state.totalIncome,
-                                expense = state.totalExpense,
-                                balance = state.balance
+                                expense = state.totalExpense
                             )
                         }
                     }
@@ -150,9 +148,10 @@ fun ReportScreen(transactionRepository: TransactionRepository) {
 
                 if (!state.hasSelectedMonthTransactions && !state.isLoading) {
                     item {
-                        FinanceMessageBanner(
-                            message = "Belum ada transaksi pada bulan ${state.monthLabel}.",
-                            isError = false,
+                        FinanceEmptyStateCard(
+                            title = "Data Bulanan Kosong",
+                            description = "Belum ada transaksi pada bulan ${state.monthLabel}.",
+                            icon = Icons.Rounded.PieChart,
                             modifier = Modifier.padding(horizontal = FinanceSpacing.screenHorizontal)
                         )
                     }
@@ -198,7 +197,7 @@ private fun ReportHeader(
             Text(
                 text = monthLabel,
                 fontSize = 13.sp,
-                color = ui.secondaryText
+                color = ui.secondaryTextReadable
             )
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -206,7 +205,7 @@ private fun ReportHeader(
                 Icon(
                     imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowLeft,
                     contentDescription = "Bulan sebelumnya",
-                    tint = ui.secondaryText
+                    tint = ui.secondaryTextReadable
                 )
             }
             Box(
@@ -226,7 +225,7 @@ private fun ReportHeader(
                 Icon(
                     imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
                     contentDescription = "Bulan berikutnya",
-                    tint = ui.secondaryText
+                    tint = ui.secondaryTextReadable
                 )
             }
         }
@@ -236,32 +235,25 @@ private fun ReportHeader(
 @Composable
 private fun SummaryCards(
     income: Double,
-    expense: Double,
-    balance: Double
+    expense: Double
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = FinanceSpacing.screenHorizontal),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         SummaryCard(
             modifier = Modifier.weight(1f),
             title = "Pemasukan",
             value = formatRupiah(income),
-            valueColor = financeUiColors().positive
+            valueColor = financeUiColors().positiveText
         )
         SummaryCard(
             modifier = Modifier.weight(1f),
             title = "Pengeluaran",
             value = formatRupiah(expense),
             valueColor = financeUiColors().negative
-        )
-        SummaryCard(
-            modifier = Modifier.weight(1f),
-            title = "Saldo",
-            value = "${if (balance >= 0) "+ " else "- "}${formatRupiah(kotlin.math.abs(balance))}",
-            valueColor = if (balance >= 0) financeUiColors().positive else financeUiColors().negative
         )
     }
 }
@@ -280,7 +272,7 @@ private fun SummaryCard(
         contentPadding = androidx.compose.foundation.layout.PaddingValues(12.dp)
     ) {
         val ui = financeUiColors()
-        Text(text = title, fontSize = 11.sp, color = ui.mutedText)
+        Text(text = title, fontSize = 11.sp, color = ui.mutedTextReadable)
         Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = value,
@@ -309,19 +301,19 @@ private fun IncomeExpenseComparisonCard(
         val ui = financeUiColors()
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text(text = "Income vs Expense", color = ui.primaryText, fontWeight = FontWeight.SemiBold)
-        RatioBar(label = "Pemasukan", ratio = incomeRatio, color = ui.positive)
-        RatioBar(label = "Pengeluaran", ratio = expenseRatio, color = ui.negative)
+        RatioBar(label = "Pemasukan", ratio = incomeRatio, barColor = ui.positive, textColor = ui.positiveText)
+        RatioBar(label = "Pengeluaran", ratio = expenseRatio, barColor = ui.negative, textColor = ui.negative)
         }
     }
 }
 
 @Composable
-private fun RatioBar(label: String, ratio: Float, color: Color) {
+private fun RatioBar(label: String, ratio: Float, barColor: Color, textColor: Color) {
     val ui = financeUiColors()
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(text = label, fontSize = 12.sp, color = ui.secondaryText)
-            Text(text = "${(ratio * 100).toInt()}%", fontSize = 12.sp, color = color, fontWeight = FontWeight.Bold)
+            Text(text = label, fontSize = 12.sp, color = ui.secondaryTextReadable)
+            Text(text = "${(ratio * 100).toInt()}%", fontSize = 12.sp, color = textColor, fontWeight = FontWeight.Bold)
         }
         Box(
             modifier = Modifier
@@ -333,7 +325,7 @@ private fun RatioBar(label: String, ratio: Float, color: Color) {
                 modifier = Modifier
                     .fillMaxWidth(ratio.coerceIn(0f, 1f))
                     .height(8.dp)
-                    .background(color, RoundedCornerShape(50))
+                    .background(barColor, RoundedCornerShape(50))
             )
         }
     }
@@ -380,7 +372,7 @@ private fun CategoryPieCard(
             Text(
                 text = "Belum ada data kategori untuk tipe ini.",
                 fontSize = 12.sp,
-                color = ui.secondaryText
+                color = ui.secondaryTextReadable
             )
         } else {
             Row(
@@ -427,7 +419,7 @@ private fun CategoryPieCard(
                                 Text(
                                     text = slice.category,
                                     fontSize = 12.sp,
-                                    color = ui.secondaryText
+                                    color = ui.secondaryTextReadable
                                 )
                             }
                             Text(
@@ -468,7 +460,7 @@ private fun CategoryTypeChip(
     ) {
         Text(
             text = label,
-            color = if (selected) ui.accent else ui.secondaryText,
+            color = if (selected) ui.accent else ui.secondaryTextReadable,
             fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.background(Color.Transparent),
@@ -495,7 +487,7 @@ private fun WeeklyBarCard(buckets: List<WeeklyBucket>) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(text = "Weekly Bars", color = ui.primaryText, fontWeight = FontWeight.SemiBold)
         if (buckets.isEmpty()) {
-            Text("Belum ada data mingguan.", fontSize = 12.sp, color = ui.secondaryText)
+            Text("Belum ada data mingguan.", fontSize = 12.sp, color = ui.secondaryTextReadable)
         } else {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -523,7 +515,7 @@ private fun WeeklyBarCard(buckets: List<WeeklyBucket>) {
                                     .background(ui.negative, RoundedCornerShape(6.dp))
                             )
                         }
-                        Text(bucket.weekLabel, fontSize = 11.sp, color = ui.mutedText)
+                        Text(bucket.weekLabel, fontSize = 11.sp, color = ui.mutedTextReadable)
                     }
                 }
             }
@@ -550,7 +542,7 @@ private fun MonthTrendCard(points: List<MonthlyTrendPoint>) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text(text = "Month to Month (6 bulan)", color = ui.primaryText, fontWeight = FontWeight.SemiBold)
         if (points.isEmpty()) {
-            Text("Belum ada data tren bulanan.", fontSize = 12.sp, color = ui.secondaryText)
+            Text("Belum ada data tren bulanan.", fontSize = 12.sp, color = ui.secondaryTextReadable)
         } else {
             Canvas(
                 modifier = Modifier
@@ -587,7 +579,7 @@ private fun MonthTrendCard(points: List<MonthlyTrendPoint>) {
                     Text(
                         text = point.monthLabel,
                         fontSize = 10.sp,
-                        color = ui.mutedText
+                        color = ui.mutedTextReadable
                     )
                 }
             }
@@ -658,3 +650,6 @@ private fun ReportScreenPreview() {
         ReportScreen(transactionRepository = fakeRepository)
     }
 }
+
+
+

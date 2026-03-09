@@ -19,3 +19,17 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Keep generic signatures and annotations needed by Retrofit/Gson reflection.
+-keepattributes Signature, RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations, AnnotationDefault
+
+# Keep Retrofit service interfaces.
+-keep interface retrofit2.** { *; }
+
+# Keep model fields for Gson serialization.
+-keepclassmembers class com.example.financefreedom.data.remote.** {
+    <fields>;
+}
+
+# Keep Firebase Crashlytics classes.
+-keep class com.google.firebase.crashlytics.** { *; }

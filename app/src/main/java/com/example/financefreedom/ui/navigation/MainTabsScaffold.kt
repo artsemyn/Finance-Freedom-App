@@ -1,4 +1,4 @@
-package com.example.financefreedom.ui.navigation
+﻿package com.example.financefreedom.ui.navigation
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
@@ -123,9 +123,14 @@ private fun RegularTabItem(
     val ui = financeUiColors()
 
     val iconColor by animateColorAsState(
-        targetValue = if (isSelected) ui.positive else ui.mutedText,
+        targetValue = if (isSelected) ui.positive else ui.mutedTextReadable,
         animationSpec = tween(250),
-        label = "color_${tab.route}"
+        label = "icon_color_${tab.route}"
+    )
+    val textColor by animateColorAsState(
+        targetValue = if (isSelected) ui.positiveText else ui.mutedTextReadable,
+        animationSpec = tween(250),
+        label = "text_color_${tab.route}"
     )
     val scale by animateFloatAsState(
         targetValue = if (isSelected) 1f else 0.9f,
@@ -167,8 +172,10 @@ private fun RegularTabItem(
             text = tab.title,
             fontSize = 10.sp,
             fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-            color = iconColor,
+            color = textColor,
             letterSpacing = 0.3.sp
         )
     }
 }
+
+

@@ -257,9 +257,9 @@ Status legend:
 - [x] Phase 5: Home Dashboard
 - [x] Phase 6: Report & Analytics
 - [x] Phase 7: UI & Design Polish
-- [ ] Phase 8: Security Hardening
-- [ ] Phase 9: Testing & Stabilization
-- [ ] Phase 10: Production Readiness
+- [x] Phase 8: Security Hardening
+- [x] Phase 9: Testing & Stabilization
+- [x] Phase 10: Production Readiness
 
 ## 14. Agent Change Logging (Mandatory)
 
@@ -274,6 +274,30 @@ Format:
 If no files were modified, no entry required.
 
 ## 15. Change Log
+
+2026-03-09 | Codex | AGENTS.md, .gitignore, app/src/main/java/com/example/financefreedom/ui/add/AddScreen.kt, app/src/main/java/com/example/financefreedom/ui/history/HistoryScreen.kt, app/src/main/java/com/example/financefreedom/ui/profile/ProfileScreen.kt | Cleaned repository hygiene by ignoring local tooling files, untracking volatile IDE selector files, and removing Compose/Java deprecation warnings from Add, History, and Profile screens.
+
+2026-03-09 | Codex | AGENTS.md, build.gradle.kts, gradle/libs.versions.toml, app/build.gradle.kts, app/proguard-rules.pro, app/src/main/AndroidManifest.xml, app/src/main/java/com/example/financefreedom/FinanceFreedomApp.kt, app/src/main/java/com/example/financefreedom/utils/CrashLogger.kt, app/src/main/java/com/example/financefreedom/data/repository/AuthRepositoryImpl.kt, app/src/main/java/com/example/financefreedom/data/repository/TransactionRepositoryImpl.kt, app/src/main/java/com/example/financefreedom/data/repository/SavingsRepositoryImpl.kt, app/src/main/java/com/example/financefreedom/data/repository/ReminderRepositoryImpl.kt, app/src/main/java/com/example/financefreedom/ui/navigation/AppNavGraph.kt, app/src/main/java/com/example/financefreedom/ui/components/FinancePrimitives.kt, app/src/main/java/com/example/financefreedom/ui/home/HomeScreen.kt, app/src/main/java/com/example/financefreedom/ui/report/ReportScreen.kt, app/src/main/java/com/example/financefreedom/ui/savings/SavingsScreen.kt, app/src/main/java/com/example/financefreedom/ui/reminder/ReminderScreen.kt, docs/testing/phase10-release-checklist.md | Completed Phase 10 production readiness by adding shared shimmer + improved empty states on key screens, integrating basic crash logging with optional Firebase Crashlytics wiring, enabling release minify/resource shrinking, bumping app version to 1.1.0, and adding release verification checklist.
+
+2026-03-09 | Codex | AGENTS.md, gradle/libs.versions.toml, app/build.gradle.kts, app/src/main/java/com/example/financefreedom/ui/add/AddScreen.kt, app/src/main/java/com/example/financefreedom/ui/auth/LoginScreen.kt, app/src/test/java/com/example/financefreedom/data/repository/AuthRepositoryImplTest.kt, app/src/test/java/com/example/financefreedom/data/repository/TransactionRepositoryImplTest.kt, app/src/test/java/com/example/financefreedom/data/repository/ReminderRepositoryImplTest.kt, app/src/test/java/com/example/financefreedom/ui/savings/SavingsViewModelTest.kt, app/src/androidTest/java/com/example/financefreedom/ui/auth/LoginScreenTest.kt, app/src/androidTest/java/com/example/financefreedom/ui/add/AddScreenDatePickerTest.kt, app/src/androidTest/java/com/example/financefreedom/ui/navigation/AppNavGraphSessionRedirectTest.kt, docs/testing/phase9-manual-checklist.md | Completed Phase 9 testing and stabilization by adding repository/ViewModel unit tests, Compose instrumentation tests for login/date/session flows, a manual QA checklist artifact, and stable UI test tags for auth/add forms.
+
+2026-03-09 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/ui/screens/Entryscreen.kt | Replaced Entry screen wallet logo icon with the app icon drawable so onboarding branding matches the launcher icon.
+
+2026-03-09 | Codex | AGENTS.md, app/src/main/AndroidManifest.xml, app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml, app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml | Switched launcher icon to the provided `app_icon.png` by wiring manifest icon references and adaptive icon foreground layers to the new drawable asset.
+
+2026-03-09 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/ui/theme/FinanceUi.kt, app/src/main/java/com/example/financefreedom/ui/add/AddScreen.kt, app/src/main/java/com/example/financefreedom/ui/home/HomeScreen.kt, app/src/main/java/com/example/financefreedom/ui/history/HistoryScreen.kt, app/src/main/java/com/example/financefreedom/ui/navigation/MainTabsScaffold.kt, app/src/main/java/com/example/financefreedom/ui/profile/ProfileScreen.kt, app/src/main/java/com/example/financefreedom/ui/reminder/ReminderScreen.kt, app/src/main/java/com/example/financefreedom/ui/report/ReportScreen.kt, app/src/main/java/com/example/financefreedom/ui/screens/Entryscreen.kt, app/src/main/java/com/example/financefreedom/ui/screens/Loginscreen.kt, app/src/main/java/com/example/financefreedom/ui/screens/RegisterScreen.kt, app/src/main/java/com/example/financefreedom/ui/auth/LoginScreen.kt, app/src/main/java/com/example/financefreedom/ui/savings/SavingsScreen.kt | Applied global readability hardening: gray text now uses readable black-toned text in light mode, and green text uses white-toned readable text in dark mode while preserving non-text green accents for icons/charts/indicators.
+
+2026-03-09 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/ui/add/AddScreen.kt | Fixed Add transaction date input by making the date field open a DatePicker and improved Add form readability by switching low-contrast hint/secondary text to theme-based high-contrast colors.
+
+2026-03-09 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/ui/report/ReportScreen.kt | Fixed Report summary card collision by removing the balance summary card and rendering only equal-width income and expense cards across the row.
+
+2026-03-09 | Codex | AGENTS.md, local.properties | Set local `FINANCE_BASE_URL` to deployed backend URL to resolve login network failures caused by missing base URL configuration after Phase 8 hardening.
+
+2026-03-09 | Codex | AGENTS.md, app/build.gradle.kts, app/src/main/AndroidManifest.xml, app/src/main/java/com/example/financefreedom/data/local/TokenManager.kt, app/src/main/java/com/example/financefreedom/data/remote/ApiClient.kt | Completed Phase 8 security hardening by moving JWT persistence to EncryptedSharedPreferences, redacting Authorization logs, externalizing BASE_URL via local.properties/env BuildConfig input, and disabling Android backup/data extraction.
+
+2026-03-09 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/ui/home/HomeScreen.kt | Updated Home balance card to use zero outer card content padding so the green gradient fills the full card surface edge-to-edge.
+
+2026-03-09 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/ui/home/HomeScreen.kt | Fixed Home total balance card gradient container to fill full card width so the green shade renders across the card.
 
 2026-03-07 | Codex | AGENTS.md, app/src/main/java/com/example/financefreedom/ui/theme/Type.kt, app/src/main/java/com/example/financefreedom/ui/theme/FinanceTokens.kt, app/src/main/java/com/example/financefreedom/ui/components/FinancePrimitives.kt, app/src/main/java/com/example/financefreedom/ui/home/HomeScreen.kt, app/src/main/java/com/example/financefreedom/ui/report/ReportScreen.kt, app/src/main/java/com/example/financefreedom/ui/reminder/ReminderScreen.kt, app/src/main/java/com/example/financefreedom/ui/savings/SavingsScreen.kt, app/src/main/java/com/example/financefreedom/ui/add/AddScreen.kt, app/src/main/java/com/example/financefreedom/ui/history/HistoryScreen.kt, app/src/main/java/com/example/financefreedom/ui/profile/ProfileScreen.kt | Completed Phase 7 UI polish by introducing shared design tokens and reusable card/banner/motion primitives, refreshing typography scale, and applying consistent rounded/elevated styling plus section animations across main tab surfaces.
 

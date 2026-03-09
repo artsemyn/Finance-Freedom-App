@@ -15,6 +15,11 @@ workRuntimeKtx = "2.10.3"
 securityCryptoKtx = "1.1.0-alpha06"
 coroutines = "1.8.1"
 animation = "1.10.3"
+mockk = "1.13.12"
+turbine = "1.1.0"
+firebaseBom = "34.4.0"
+googleServices = "4.4.3"
+firebaseCrashlyticsPlugin = "3.0.6"
 
 [libraries]
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
@@ -44,8 +49,15 @@ retrofit-converter-gson = { group = "com.squareup.retrofit2", name = "converter-
 okhttp-core = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 androidx-compose-animation = { group = "androidx.compose.animation", name = "animation", version.ref = "animation" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
+androidx-work-testing = { group = "androidx.work", name = "work-testing", version.ref = "workRuntimeKtx" }
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlyticsPlugin" }
